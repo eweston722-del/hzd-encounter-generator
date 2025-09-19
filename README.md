@@ -11,4 +11,4 @@ Custom encounter generator for Horizon Zero Dawn: the Board Game. It is able to 
 
 ## Credits
 
-All credit for the used image resources goes to Guerilla Gamesa and Steamforged Games
+All images are provided by Guerrilla B.V. and Steamforged Games Ltd and used under their respective terms
