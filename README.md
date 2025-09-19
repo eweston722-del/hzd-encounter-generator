@@ -9,6 +9,6 @@ Custom encounter generator for Horizon Zero Dawn: the Board Game. It is able to 
 - generate terrain for the maps
 - generate custom encounter briefs based on the mechanics for random generation used in Horizon Forbidden West: Seeds of Rebellion
 
-## Credits
+## Image Attributions
 
 All images are provided by Guerrilla B.V. and Steamforged Games Ltd and used under their respective terms
