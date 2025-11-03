@@ -1387,3 +1387,33 @@ function generateTerrain() {
         document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + terrainB;
     }
 }
+
+function generateEncounterCard() {
+    // encounterBoard & encounterBrief speichern
+    //localStorage.setItem("encounterBoardHTML", document.getElementById("output").innerHTML);
+    //localStorage.setItem("encounterBriefHTML", document.getElementById("encounterBrief").innerHTML);
+    // Level + Spieleranzahl extra speichern
+    //localStorage.setItem("encounterLevel", encounterLevel);
+    //localStorage.setItem("players", document.getElementById("1-2").checked ? "1-2" : "3-4");
+
+    saveValuesToStorage();
+
+    // neue Seite öffnen
+    //window.open("encounterCardV2.html", "_blank");
+
+    // Alle Daten, die du übergeben willst, zusammenfassen
+    encounterBriefData = JSON.parse(localStorage.getItem("encounterBriefData") || "{}");
+    const data = {
+        encounterBriefData,
+        placedTileList,
+        resources,
+        terrainA,
+        terrainB
+    };
+
+    // JSON → Base64 (URL-sicher)
+    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+
+    // Karte öffnen
+    window.open(`encounterCardV3.html#${encoded}`, "_blank");
+};
