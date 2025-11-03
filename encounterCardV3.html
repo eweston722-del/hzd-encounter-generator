@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Encounter Card</title>
+  <style>
+    body { margin: 0; padding: 0; background: black; }
+    #cardContainer {
+      position: relative;
+      width: 1094px;
+      height: 1534px;
+      margin: 0 auto;
+      background: url("system/resources/BG.png") no-repeat center center;
+      background-size: cover;
+    }
+    .overlay {
+      position: absolute;
+      font-family: "OitaRegular";
+      color: black;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    /*#levelOverlay { left: 930px; top: 120px; }*/
+    #playersOverlay { left: 942px; top: 270px; color: white; }
+    #primaryOverlay { left: 140px; top: 1290px; color: white; }
+    #secondaryOverlay { left: 354px; top: 1290px; color: white; }
+
+    /* Tilefield */
+    #tileField {
+      position: absolute;
+      left: 240px;
+      top: 500px;
+      width: 630px;
+      height: 500px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .tile {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: top left;
+      overflow: visible;
+    }
+    .tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+    .tile-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+      font-family: "OitaRegular";
+    }
+
+    @font-face {
+      font-family: 'OitaRegular'; /* Ein Name, den Sie frei wählen */
+      src: url('system/resources/Oita\ W01\ Ext\ Regular.ttf'); /* Pfad zur Schriftdatei */
+    }
+
+    @font-face {
+        font-family: 'horizon'; /* Ein Name, den Sie frei wählen */
+        src: url('system/resources/Horizon-nMeM.ttf'); /* Pfad zur Schriftdatei */
+    }
+
+    #squareOverlay { left: 735px; top: 1290px; color: white; }
+    #triangleOverlay { left: 953px; top: 1290px; color: white; }
+    #headingOverlay {
+      position: absolute;
+      left: 270px;
+      top: 100px;
+      font-family: "OitaRegular";
+      color: white;
+      font-size: 80px;
+      font-weight: bolder;
+    }
+    #levelOverlay {
+      position: absolute;
+      left: 942px;
+      top: 100px;
+      font-family: "OitaRegular";
+      color: white;
+      font-size: 80px;
+      font-weight: bolder;
+    }
+    #resourcesOverlay {
+      position: absolute;
+      left: 136px;
+      top: 394px;
+      transform: translate(-50%, -50%); /* verankert Mitte */
+      font-family: "OitaRegular";
+      color: white;
+      font-size: 80px;
+      font-weight: bolder;
+    }
+    .symbol {
+      transform: translate(-50%, -50%); /* verankert Mitte */
+    }
+  </style>
+</head>
+<body>
+  <div id="cardContainer">
+    <div id="levelOverlay" class="overlay"></div>
+    <div id="playersOverlay" class="overlay"></div>
+    <div id="primaryOverlay" class="overlay"></div>
+    <div id="secondaryOverlay" class="overlay"></div>
+    <div id="squareOverlay" class="overlay"></div>
+    <div id="triangleOverlay" class="overlay"></div>
+    <div id="resourcesOverlay" class="overlay"></div>
+    <div id="headingOverlay" class="headingOverlay"></div>
+    <div id="tileField"></div>
+  </div>
+
+  <script>
+    // --- Daten aus localStorage laden ---
+    //const encounterBrief = JSON.parse(localStorage.getItem("encounterBriefData") || "{}");
+    //const placedTileList = JSON.parse(localStorage.getItem("placedTileList") || "[]");
+    //const resources = JSON.parse(localStorage.getItem("resources")) || 0;
+    //const terrainSquare = JSON.parse(localStorage.getItem("terrainA")) || "-";
+    //const terrainTriangle = JSON.parse(localStorage.getItem("terrainB")) || "-";
+
+    // --- Daten aus URL-Hash laden ---
+    function getDataFromHash() {
+      if (!location.hash) return {};
+      try {
+        const hash = location.hash.substring(1); // '#' entfernen
+        const json = decodeURIComponent(atob(hash));
+        return JSON.parse(json);
+      } catch (err) {
+        console.error("Fehler beim Lesen oder Dekodieren des Hashes:", err);
+        return {};
+      }
+    }
+
+    const data = getDataFromHash();
+
+    // Daten extrahieren
+    const encounterBrief = data.encounterBriefData || {};
+    const placedTileList = data.placedTileList || [];
+    const resources = data.resources ?? 0;
+    const terrainSquare = data.terrainA || "-";
+    const terrainTriangle = data.terrainB || "-";
+
+
+    // Overlays füllen
+    document.getElementById("levelOverlay").textContent = encounterBrief.level || "-";
+    document.getElementById("playersOverlay").textContent = encounterBrief.players || "-";
+    document.getElementById("headingOverlay").textContent = "Hunter's End" || "-";
+    document.getElementById("resourcesOverlay").textContent = resources;
+
+    // Verzeichnis der vorhandenen Symbole erstellen
+    const machines = [];
+    machines.push("watcher");
+    machines.push("grazer");
+    machines.push("strider");
+    machines.push("scrapper");
+    machines.push("sawtooth");
+    machines.push("shell-walker");
+    machines.push("charger");
+    machines.push("lancehorn");
+    machines.push("glinthawk");
+    machines.push("ravager");
+    machines.push("broadhead");
+    machines.push("trampler");
+    machines.push("behemoth");
+    machines.push("redeye watcher");
+    machines.push("longleg");
+    machines.push("stalker");
+    machines.push("snapmaw");
+    machines.push("fire bellowback");
+    machines.push("freeze bellowback");
+    machines.push("scorcher");
+    machines.push("frostclaw");
+    machines.push("thunderjaw");
+    machines.push("stormbird");
+    machines.push("fireclaw");
+    machines.push("rock breaker");
+    machines.push("deathbringer");
+    machines.push("corruptor");
+    const enemySymbols = machines;
+
+    // Enemys
+    // Primary + Secondary als Symbole
+    function setSymbol(overlayId, machineName) {
+      const container = document.getElementById(overlayId);
+      container.innerHTML = ""; // leeren
+      if (machineName && machineName !== "-") {
+        if (enemySymbols.includes(machineName)) {
+          const img = document.createElement("img");
+          img.src = `system/resources/symbols/${machineName}.webp`;
+          img.alt = machineName;
+          //img.style.width = "128px";   // Symbolgröße anpassen
+          img.style.height = "128px";
+          //img.style.transform = translate(-50);
+          container.appendChild(img);
+          img.classList.add("symbol");
+        } else {
+          container.textContent = machineName;
+          container.classList.add("symbol");
+        }
+      } else {
+        container.textContent = "-";
+      }
+    }
+    setSymbol("primaryOverlay", encounterBrief.primary);
+    setSymbol("secondaryOverlay", encounterBrief.secondary);
+    //document.getElementById("primaryOverlay").textContent = encounterBrief.primary || "-";
+    //document.getElementById("secondaryOverlay").textContent = encounterBrief.secondary || "-";
+
+    // Terrain als Symbole
+    function setTerrainSymbol(overlayId, terrain) {
+      const container = document.getElementById(overlayId);
+      container.innerHTML = ""; // leeren
+      if (terrain && terrain !== "-") {
+        const img = document.createElement("img");
+        img.src = `system/resources/symbols/${terrain}.png`;
+        img.alt = terrain;
+        //img.style.width = "128px";   // Symbolgröße anpassen
+        img.style.height = "128px";
+        //img.style.transform = translate(-50);
+        container.appendChild(img);
+        img.classList.add("symbol");
+      } else {
+        container.textContent = "-";
+        container.classList.add("symbol");
+      }
+    }
+    setTerrainSymbol("squareOverlay", terrainSquare);
+    setTerrainSymbol("triangleOverlay", terrainTriangle);
+
+    // Feld
+    const tileField = document.getElementById("tileField");
+    const fieldWidth = tileField.clientWidth || 630;
+    const fieldHeight = tileField.clientHeight || 500;
+
+    if (!Array.isArray(placedTileList) || placedTileList.length === 0) {
+      console.warn("placedTileList leer oder nicht vorhanden.");
+    } else {
+      const originalTileSize = 99;
+      const originalThird = originalTileSize / 3;
+
+      // Bounding box in Drittel-Einheiten
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      placedTileList.forEach(entry => {
+        const ex = Number(entry.x);
+        const ey = Number(entry.y);
+        if (!Number.isFinite(ex) || !Number.isFinite(ey)) return;
+        if (ex < minX) minX = ex;
+        if (ey < minY) minY = ey;
+        if (ex + 3 > maxX) maxX = ex + 3;
+        if (ey + 3 > maxY) maxY = ey + 3;
+      });
+
+      if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
+        minX = 0; minY = 0; maxX = 3; maxY = 3;
+      }
+
+      const gridWidthInThirds = maxX - minX;
+      const gridHeightInThirds = maxY - minY;
+
+      // Pixel pro Drittel
+      let cellSizeX = fieldWidth / gridWidthInThirds;
+      let cellSizeY = fieldHeight / gridHeightInThirds;
+      const cellSize = Math.min(cellSizeX, cellSizeY);
+
+      // Pixelgröße einer ganzen Tile (3 Drittel)
+      const tilePixelSize = 3 * cellSize;
+
+      tileField.innerHTML = "";
+
+      placedTileList.forEach((entry, index) => {
+        const entryTileObj = entry.tile;
+        const tileId = (entryTileObj && (entryTileObj.id || entryTileObj.name)) || String(entryTileObj) || `tile${index}`;
+        const tx = Number(entry.x);
+        const ty = Number(entry.y);
+        const rot = Number(entry.rot) || 0;
+
+        const leftPx = (tx - minX) * cellSize;
+        const topPx  = (ty - minY) * cellSize;
+
+        const tileDiv = document.createElement("div");
+        tileDiv.className = "tile";
+        tileDiv.style.left = `${leftPx}px`;
+        tileDiv.style.top  = `${topPx}px`;
+        tileDiv.style.width  = `${tilePixelSize}px`;
+        tileDiv.style.height = `${tilePixelSize}px`;
+
+        // Bildquelle: erstes Element = starting tile
+        const img = document.createElement("img");
+        img.src = index === 0
+          ? "system/resources/starting tile_standard.jpg"
+          : "system/resources/standard tile_standard.jpg";
+
+        // <-- Korrektur: rot ist ein Index (0..3); wende rot*90 an -->
+        img.style.transform = `rotate(${rot * 90}deg)`;
+        img.style.transformOrigin = "center center";
+        img.alt = tileId;
+
+        tileDiv.appendChild(img);
+
+        // Label = 40% der Tile-Größe
+        const label = document.createElement("div");
+        label.className = "tile-label";
+        const labelSize = 0.4 * tilePixelSize;
+        label.style.width = `${labelSize}px`;
+        label.style.height = `${labelSize}px`;
+        label.style.fontSize = `${Math.max(10, Math.round(labelSize * 0.9))}px`;
+        label.textContent = tileId;
+        label.style.fontFamily = "OitaRegular";
+
+        // --- Starting Tile Sonderformat ---
+        if (index === 0) {
+          label.style.color = "black";
+        }
+
+        tileDiv.appendChild(label);
+
+        tileField.appendChild(tileDiv);
+      });
+    }
+  </script>
+</body>
+</html>
