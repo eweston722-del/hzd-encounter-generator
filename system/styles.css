@@ -31,6 +31,7 @@
  * Copyright (C) 2025 F.G. Schubert
  */
 
+
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -38,6 +39,7 @@ body {
     padding: 0;
     background: #f4f4f9;
     background-image: url('resources/titleimage.png');
+    background-size: 100%;
     color: #333;
     justify-content: center;
     align-items: center;
@@ -46,6 +48,7 @@ body {
 
 header {
     background-image: url('resources/titleimage.png');
+    background-size: 100%;
     color: #fff;
     padding: 1.5rem 0;
     text-align: center;
@@ -61,12 +64,17 @@ header p {
     font-size: 2.0rem;
 }
 
+header img {
+    filter: invert();
+}
+
 main {
     max-width: 820px;
     margin: 2rem auto;
     padding: 1rem;
     background: #fff;
-    background-image: url('resources/background2.png');
+    background-image: url('resources/background3.png');
+    background-size: 100%;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
