@@ -12,3 +12,4 @@ Custom encounter generator for Horizon Zero Dawn: the Board Game. It is able to 
 ## Image Attributions
 
 All images are provided by Guerrilla B.V. and Steamforged Games Ltd and used under their respective terms
+The share Symbol is a SF Symbol provided by Apple Inc.
