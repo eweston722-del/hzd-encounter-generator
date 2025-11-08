@@ -102,6 +102,15 @@ function loadValuesFromStorage() {
     document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol) " + terrainA;
     document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + terrainB;
     document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
+
+    chosenPrimary = JSON.parse(localStorage.getItem("encounterBriefData")).primary || "-";
+    primaryCount =  JSON.parse(localStorage.getItem("encounterBriefData")).primaryCount || 0;
+    chosenSecondary =  JSON.parse(localStorage.getItem("encounterBriefData")).secondary || "-";
+    secondaryCount =  JSON.parse(localStorage.getItem("encounterBriefData")).secondaryCount || "-";
+    chosenDualPrimary =  JSON.parse(localStorage.getItem("encounterBriefData")).dualPrimary || "-";
+    dualPrimaryCount =  JSON.parse(localStorage.getItem("encounterBriefData")).dualPrimaryCount || "-";
+    chosenDualSecondary =  JSON.parse(localStorage.getItem("encounterBriefData")).dualSecondary || "-";
+    dualSecondaryCount =  JSON.parse(localStorage.getItem("encounterBriefData")).dualSecondaryCount || "-";
 }
 
 //========== save values to storage ==========//
@@ -153,7 +162,14 @@ function saveValuesToStorage() {
         level: encounterLevel,
         players: document.getElementById("1-2").checked ? "1-2" : "3-4",
         primary: chosenPrimary || "-",
-        secondary: chosenSecondary || "-"
+        primaryCount: primaryCount || 0,
+        secondary: chosenSecondary || "-",
+        secondaryCount: secondaryCount || 0,
+        dualPrimary: chosenDualPrimary || "-",
+        dualPrimaryCount: dualPrimaryCount || 0,
+        dualSecondary: chosenDualSecondary || "-",
+        dualSecondaryCount: dualSecondaryCount || 0,
+        numberOverlay: numberOverlay || false
     };
     // In localStorage speichern
     localStorage.setItem("encounterBriefData", JSON.stringify(encounterBriefData));
@@ -225,9 +241,17 @@ document.getElementById("tileCount").value = '2';
 
 // --- Maschinen für Primär / Sekundär ---
 let chosenPrimary = null;
+let primaryCount = 0;
 let chosenSecondary = null;
+let secondaryCount = 0;
+let chosenDualPrimary = null;
+let dualPrimaryCount = 0;
+let chosenDualSecondary = null;
+let dualSecondaryCount = 0;
 
 let placedTileList = []; // Liste für Random-Auswahl
+
+let numberOverlay = false;
 
 let terrainA = "";
 let terrainB = "";
@@ -615,6 +639,10 @@ function generateGrid() {
         chain(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
     } else if (document.getElementById("arrangeRandom").checked == true) {
         arrangeRandom(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+    } else if (document.getElementById("planeGrid2x2").checked == true) {
+        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2")
+    } else if (document.getElementById("planeGrid3x3").checked == true) {
+        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3")
     } else {
         mosaik(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
     }
@@ -777,6 +805,7 @@ function chain(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toP
         // Wenn frei: Tile platzieren
         output.appendChild(createTileElement(newTile, rot, xPosGlob, yPosGlob));
         occupyCells(newTile.id, rotTileMatrix, rot, xPosGlob, yPosGlob);
+        placedTileList.push({ tile: newTile, x: xPosGlob, y: yPosGlob, rot, matrix: rotTileMatrix });
 
         // Neues Tile als Basis für nächste Iteration
         base = newTile;
@@ -990,16 +1019,32 @@ function differ(string) {
         document.getElementById("chain").checked = true;
         document.getElementById("arrangeRandom").checked = false;
         document.getElementById("mosaik").checked = false;
+        document.getElementById("planeGrid2x2").checked = false;
+        document.getElementById("planeGrid3x3").checked = false;
     } else if (string == "arrangeRandom") {
         document.getElementById("chain").checked = false;
         document.getElementById("arrangeRandom").checked = true;
         document.getElementById("mosaik").checked = false;
+        document.getElementById("planeGrid2x2").checked = false;
+        document.getElementById("planeGrid3x3").checked = false;
     } else if (string == "1-2") {
         document.getElementById("1-2").checked = true;
         document.getElementById("3-4").checked = false;
     } else if (string == "3-4") {
         document.getElementById("1-2").checked = false;
         document.getElementById("3-4").checked = true;
+    } else if (string == "planeGrid2x2") {
+        document.getElementById("chain").checked = false;
+        document.getElementById("arrangeRandom").checked = false;
+        document.getElementById("mosaik").checked = false;
+        document.getElementById("planeGrid2x2").checked = true;
+        document.getElementById("planeGrid3x3").checked = false;
+    } else if (string == "planeGrid3x3") {
+        document.getElementById("chain").checked = false;
+        document.getElementById("arrangeRandom").checked = false;
+        document.getElementById("mosaik").checked = false;
+        document.getElementById("planeGrid2x2").checked = false;
+        document.getElementById("planeGrid3x3").checked = true;
     } else {
         document.getElementById("chain").checked = false;
         document.getElementById("arrangeRandom").checked = false;
@@ -1388,13 +1433,143 @@ function generateTerrain() {
     }
 }
 
-function generateEncounterCard() {
+function generateEncounterCard(withNumbers) {
+    //let encounterBriefData = JSON.parse(localStorage.getItem("encounterBriefData") || "{}");
+    loadValuesFromStorage();
+
+    // Encounter-Brief vorbereiten
+    encounterBriefData = {
+        level: encounterLevel,
+        players: document.getElementById("1-2").checked ? "1-2" : "3-4",
+        primary: chosenPrimary || "-",
+        primaryCount: primaryCount || 0,
+        secondary: chosenSecondary || "-",
+        secondaryCount: secondaryCount || 0,
+        dualPrimary: chosenDualPrimary || "-",
+        dualPrimaryCount: dualPrimaryCount || 0,
+        dualSecondary: chosenDualSecondary || "-",
+        dualSecondaryCount: dualSecondaryCount || 0,
+        numberOverlay: withNumbers || false
+    };
+    // In localStorage speichern
+    localStorage.setItem("encounterBriefData", JSON.stringify(encounterBriefData));
+
+    // --- Prüfen, ob dual Enemys aktiv oder nötig ---
+    const manualDual = document.getElementById("dualEnemys")?.checked || false;
+    const hasSecondary = encounterBriefData.secondary && encounterBriefData.secondary !== "-" && encounterBriefData.secondary !== "";
+    const isDual = manualDual || hasSecondary;
+
+    // --- Alle Daten in einem Objekt bündeln ---
+    const data = {
+        encounterBriefData,
+        placedTileList,
+        resources,
+        terrainA,
+        terrainB
+    };
+
+    
+    // JSON → Base64 (URL-sicher)
+    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+
+    // JSON → komprimiert → Base64
+    const json = JSON.stringify(data);
+    const compressed = LZString.compressToEncodedURIComponent(json);
+
+    // Copy the text inside the text field
+    const target = isDual ? "encounterCardV4.html#dual=" + compressed : "encounterCardV4.html#" + compressed;
+    window.open(target, "_blank");
+};
+
+function planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, generationType) {
+    let rows = 0;
+    let cols = 0;
+
+    if (generationType == "2x2") {
+        rows = 2;
+        cols = 2;
+    } else if (generationType == "3x3") {
+        rows = 3;
+        cols = 3;
+    }
+
+    let basePosition = {
+        row: Math.floor(Math.random() * rows) + 1,
+        col: Math.floor(Math.random() * cols + 1)
+    }
+
+    for (let row = 1; row <= rows; row++) {
+        for (let col = 1; col <= cols; col++) {
+            if (basePosition.row == row && basePosition.col == col) {
+                //
+            } else {
+                //
+            }
+            
+            // Basis-Tile an Position x:9 y:9 bereits generiert
+
+            if (row == 1 && col == cols) {
+                //
+            } else {
+                let rot = Math.floor(Math.random() * 3);
+
+                // Zufälliges, noch ungenutztes Tile wählen
+                const unusedTiles = [];
+                for (const def of tileDefinitions) {
+                    const cand = parseTile(def);
+                    if (!usedTileIds.has(cand.id)) unusedTiles.push(cand);
+                }
+                const newTile = unusedTiles[Math.floor(Math.random() * unusedTiles.length)];
+                usedTileIds.add(newTile.id);
+
+                for (const specialTileID of specialTiles) {
+                    if (newTile.id == specialTileID) {
+                        if (specialTileID == "1K") usedTileIds.add("5K");
+                        if (specialTileID == "2K") usedTileIds.add("6K");
+                        if (specialTileID == "3K") usedTileIds.add("7K");
+                        if (specialTileID == "4K") usedTileIds.add("8K");
+                        
+                        if (specialTileID == "5K") usedTileIds.add("1K");
+                        if (specialTileID == "6K") usedTileIds.add("2K");
+                        if (specialTileID == "7K") usedTileIds.add("3K");
+                        if (specialTileID == "8K") usedTileIds.add("4K");
+                    }
+                }
+
+                // Rotierte Matrix des neuen Tiles bestimmen
+                let rotTileMatrix = newTile.matrix;
+                if (rot === 1) rotTileMatrix = rotateMatrix(newTile.matrix, 90);
+                else if (rot === 2) rotTileMatrix = rotateMatrix(newTile.matrix, 180);
+                else if (rot === 3) rotTileMatrix = rotateMatrix(newTile.matrix, 270);
+
+                // globale Position bestimmen
+                let xPosGlob = 0;
+                let yPosGlob = 0;
+                if (row == 1) {
+                    xPosGlob = 9 + (col * 3);
+                } else {
+                    xPosGlob = 6 + (col * 3);
+                }
+                yPosGlob = 6 + (row * 3);
+
+                // Tile platzieren
+                output.appendChild(createTileElement(newTile, rot, xPosGlob, yPosGlob));
+                occupyCells(newTile.id, rotTileMatrix, rot, xPosGlob, yPosGlob);
+                placedTileList.push({ tile: newTile, x: xPosGlob, y: yPosGlob, rot, matrix: rotTileMatrix });
+            }
+        }
+    }
+}
+
+function copyLink(withNumbers) {
     // encounterBoard & encounterBrief speichern
     //localStorage.setItem("encounterBoardHTML", document.getElementById("output").innerHTML);
     //localStorage.setItem("encounterBriefHTML", document.getElementById("encounterBrief").innerHTML);
     // Level + Spieleranzahl extra speichern
     //localStorage.setItem("encounterLevel", encounterLevel);
     //localStorage.setItem("players", document.getElementById("1-2").checked ? "1-2" : "3-4");
+
+    numberOverlay = withNumbers;
 
     saveValuesToStorage();
 
@@ -1403,6 +1578,10 @@ function generateEncounterCard() {
 
     // Alle Daten, die du übergeben willst, zusammenfassen
     encounterBriefData = JSON.parse(localStorage.getItem("encounterBriefData") || "{}");
+    // --- Prüfen, ob dual Enemys aktiv oder nötig ---
+    const manualDual = document.getElementById("dualEnemys")?.checked || false;
+    const hasSecondary = encounterBriefData.secondary && encounterBriefData.secondary !== "-" && encounterBriefData.secondary !== "";
+    const isDual = manualDual || hasSecondary;
     const data = {
         encounterBriefData,
         placedTileList,
@@ -1414,6 +1593,143 @@ function generateEncounterCard() {
     // JSON → Base64 (URL-sicher)
     const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
 
-    // Karte öffnen
-    window.open(`encounterCardV3.html#${encoded}`, "_blank");
-};
+    // JSON → komprimiert → Base64
+    const json = JSON.stringify(data);
+    const compressed = LZString.compressToEncodedURIComponent(json);
+
+    // Copy the text inside the text field
+    const target = isDual ? "encounterCardV4.html#dual=" + compressed : "encounterCardV4.html#" + compressed;
+    navigator.clipboard.writeText(`encounterCardV3.html#${target}`);
+
+    // Alert the copied text
+    alert("Copied Encounter Card link");
+}
+
+function generateEncounterBriefV6() {
+    chosenPrimary = null;
+    chosenSecondary = null;
+    chosenDualPrimary = null;
+    chosenDualSecondary = null;
+
+  createMachineDefinitions();
+
+  const levelIndicator = document.getElementById("encounterLevel");
+  const machineList = document.getElementById("machineList");
+  let tableInnerHtml = "";
+
+  // --- Level zufällig bestimmen ---
+  if (document.getElementById("lvl4").checked && document.getElementById("lvl5").checked) {
+    encounterLevel = Math.floor(Math.random() * 5) + 1; // 1–5
+  } else if (document.getElementById("lvl4").checked) {
+    encounterLevel = Math.floor(Math.random() * 4) + 1; // 1–4
+  } else if (document.getElementById("lvl5").checked) {
+    encounterLevel = Math.floor(Math.random() * 5) + 1;
+    if (encounterLevel === 4) encounterLevel = 3;
+  } else {
+    encounterLevel = Math.floor(Math.random() * 3) + 1; // 1–3
+  }
+
+  const is12Players = document.getElementById("1-2").checked;
+  const is34Players = document.getElementById("3-4").checked;
+  const spawnFactor = is12Players ? 1 : (is34Players ? 2 : 1);
+  const dualEnabled = document.getElementById("dualEnemys").checked;
+
+  const usedMachinesCount = {};
+  const chosenPrimaries = [];
+  const chosenSecondaries = [];
+  const enemyDiffs = [];
+
+  // --- Maschinen vorbereiten ---
+  const validMachines = machineDefinitions.map(def => {
+    const [nameType, levelData] = def.split(":");
+    const parts = nameType.split(".");
+    const name = parts.slice(0, -3).join(".");
+    const amount = parseInt(parts[parts.length - 3], 10);
+    const difficultyModifier = parseInt(parts[parts.length - 2], 10);
+    const shared = parts[parts.length - 1];
+    const levels = levelData.split(";").map(v => {
+      const nums = v.replace(/[()]/g, "").split(",");
+      return { primary: parseInt(nums[0]) || 0, secondary: parseInt(nums[1]) || 0 };
+    });
+    return { name, amount, difficultyModifier, shared, levels };
+  });
+
+  function pickEnemy(type) {
+    const candidates = validMachines.filter(m => {
+      const levelData = m.levels[encounterLevel - 1] || {};
+      const used = usedMachinesCount[m.name] || 0;
+      const value = type === "primary" ? levelData.primary : levelData.secondary;
+      return value > 0 && used < m.amount;
+    });
+    if (candidates.length === 0) return null;
+
+    const machine = candidates[Math.floor(Math.random() * candidates.length)];
+    const levelData = machine.levels[encounterLevel - 1];
+    const value = type === "primary" ? levelData.primary : levelData.secondary;
+    let maxAllowed = Math.min(value, machine.amount - (usedMachinesCount[machine.name] || 0));
+    const count = Math.min(maxAllowed, spawnFactor);
+    if (count > 0) {
+      usedMachinesCount[machine.name] = (usedMachinesCount[machine.name] || 0) + count;
+      for (let k = 0; k < count; k++) enemyDiffs.push(machine.difficultyModifier);
+      return { name: machine.name, count };
+    }
+    return null;
+  }
+
+  // --- Primär/Sekundär Enemy auswählen ---
+  const primary1 = pickEnemy("primary");
+  chosenPrimary = primary1.name;
+  primaryCount = primary1.count;
+  const secondary1 = pickEnemy("secondary");
+  chosenSecondary = secondary1.name;
+  secondaryCount = secondary1.count;
+  if (primary1) chosenPrimaries.push(primary1);
+  if (secondary1) chosenSecondaries.push(secondary1);
+
+  // --- Bei dualEnemys Checkbox: zweite Auswahl ---
+  if (dualEnabled) {
+    const primary2 = pickEnemy("primary");
+    chosenDualPrimary = primary2.name;
+    dualPrimaryCount = primary2.count;
+    const secondary2 = pickEnemy("secondary");
+    chosenDualSecondary = secondary2.name;
+    dualSecondaryCount = secondary2.count;
+    if (primary2) chosenPrimaries.push(primary2);
+    if (secondary2) chosenSecondaries.push(secondary2);
+  }
+
+  // --- Difficulty berechnen ---
+  let diff = 0;
+  if (enemyDiffs.length > 0)
+    diff = parseFloat((enemyDiffs.reduce((a, b) => a + b, 0) / enemyDiffs.length).toFixed(2));
+
+  // --- Tabelle rendern ---
+  tableInnerHtml = `
+    <tr>
+      <th>Primary Enemy (A)</th><th>Count</th>
+      <th>Secondary Enemy (B)</th><th>Count</th>
+    </tr>
+  `;
+
+  const maxRows = Math.max(chosenPrimaries.length, chosenSecondaries.length);
+  for (let i = 0; i < maxRows; i++) {
+    const p = chosenPrimaries[i] || { name: "-", count: "-" };
+    const s = chosenSecondaries[i] || { name: "-", count: "-" };
+    tableInnerHtml += `
+      <tr>
+        <td>${p.name}</td><td>${p.count}</td>
+        <td>${s.name}</td><td>${s.count}</td>
+      </tr>
+    `;
+  }
+
+  machineList.innerHTML = tableInnerHtml;
+  levelIndicator.innerHTML = "Encounter Level: " + encounterLevel;
+  renderDifficultyBar(diff);
+
+  // --- Resources ---
+  resources = Math.floor(Math.random() * 6);
+  document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
+
+  saveValuesToStorage();
+}
