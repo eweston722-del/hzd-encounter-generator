@@ -189,3 +189,74 @@ td:nth-child(even), th:nth-child(even) {
     font-family: 'horizon'; /* Ein Name, den Sie frei wählen */
     src: url('resources/Horizon-nMeM.ttf'); /* Pfad zur Schriftdatei */
 }
+
+nav {
+  position: fixed; /* Positioniert das Element relativ zum Browserfenster */
+  top: 0;          /* Platziert das Element ganz oben am Fenster */
+  width: 100%;     /* Stellt sicher, dass die Leiste die gesamte Breite einnimmt */
+  background-color: #f0f0f058; /* Beispiel: Hintergrundfarbe */
+  background-image: url("resources/NavBarBG.png");
+  background-size: cover;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  border: #2d3436;
+  border-width: 2px;
+  border-radius: 10px;
+  padding: 2px;
+}
+
+/* Optional: Verhindert, dass der Inhalt vom Menü überdeckt wird */
+body {
+  margin-top: 50px; /* Passt den oberen Abstand an die Höhe Ihrer Navigationsleiste an */
+}
+
+/* Dropdown Button */
+.dropbtn {
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 50%;
+  background-image: url("resources/share.png");
+  background-color: #3e475a;
+  background-size: cover;
+  width: 40px;
+  height: 40px;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-image: url("resources/share_hover.png");
+    background-color: #54575f;
+    background-size: cover;
+}
