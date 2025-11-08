@@ -32,7 +32,7 @@
             <img src="system/resources/title2.png" style="height: 40px;">
             <h1 style="padding-left: 10px; padding-right: 10px;">Encounter Generator</h1>
             <div class="dropdown">
-                <div class="dropbtn"></div>
+                <div class="dropbtn" onclick="toggleDropdown(this)"></div>
                 <div class="dropdown-content">
                     <a onclick="generateEncounterCard(false)">open as Encounter Card</a>
                     <a onclick="generateEncounterCard(true)">open as Encounter Card with enemy numbers</a>
@@ -135,6 +135,25 @@
         <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 
         <script src="system/scriptV2.js"></script>
+
+		<script>
+            function toggleDropdown(btn) {
+                // Alle anderen Dropdowns schließen (optional)
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    if (d !== btn.parentElement) d.classList.remove('show');
+                });
+
+                // Aktuelles Dropdown ein-/ausblenden
+                btn.parentElement.classList.toggle('show');
+            }
+
+            // Schließen, wenn außerhalb getippt wird
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.dropbtn')) {
+                    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+                }
+            });
+        </script>
     </main>
 
     <footer>
@@ -176,6 +195,7 @@
  */
 -->
 </html>
+
 
 
 
