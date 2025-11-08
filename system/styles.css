@@ -190,7 +190,7 @@ td:nth-child(even), th:nth-child(even) {
     src: url('resources/Horizon-nMeM.ttf'); /* Pfad zur Schriftdatei */
 }
 
-nav {
+.nav {
   position: fixed; /* Positioniert das Element relativ zum Browserfenster */
   top: 0;          /* Platziert das Element ganz oben am Fenster */
   width: 100%;     /* Stellt sicher, dass die Leiste die gesamte Breite einnimmt */
@@ -260,3 +260,4 @@ body {
     background-color: #54575f;
     background-size: cover;
 }
+
