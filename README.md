@@ -8,6 +8,11 @@ Custom encounter generator for Horizon Zero Dawn: the Board Game. It is able to 
 - generate encounter maps either in path, random or grid mode
 - generate terrain for the maps
 - generate custom encounter briefs based on the mechanics for random generation used in Horizon Forbidden West: Seeds of Rebellion
+- generate encounter cards in style of the original SFG encounter cards of Horizon Zero Dawn: the Board Game
+- share encounter cards with permalink
+- choose if encounter cards should display the enemy number
+- generate advanced encounter briefs with dual enemys
+- generate encounter cards with support for dual enemys (warning: older permalinks may not be functional anymore)
 
 ## Image Attributions
 
