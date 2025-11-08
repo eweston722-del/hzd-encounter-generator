@@ -1599,7 +1599,7 @@ function copyLink(withNumbers) {
 
     // Copy the text inside the text field
     const target = isDual ? "encounterCardV4.html#dual=" + compressed : "encounterCardV4.html#" + compressed;
-    navigator.clipboard.writeText(`encounterCardV3.html#${target}`);
+    navigator.clipboard.writeText(`https://eweston722-del.github.io/hzd-encounter-generator/${target}`);
 
     // Alert the copied text
     alert("Copied Encounter Card link");
