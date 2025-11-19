@@ -28,7 +28,19 @@
     </header>
 
     <main>
-        <h1>Encounter Generator</h1>
+        <nav class="nav">
+            <img src="system/resources/title2.png" style="height: 40px;">
+            <h1 style="padding-left: 10px; padding-right: 10px;">Encounter Generator</h1>
+            <div class="dropdown">
+                <div class="dropbtn" onclick="toggleDropdown(this)"></div>
+                <div class="dropdown-content">
+                    <a onclick="generateEncounterCard(false)">open as Encounter Card</a>
+                    <a onclick="generateEncounterCard(true)">open as Encounter Card with enemy numbers</a>
+                    <a onclick="copyLink(false)">copy Encounter Card link to clipboard</a>
+                    <a onclick="copyLink(true)">copy Encounter Card with enemy numbers link to clipboard</a>
+                </div>
+            </div>
+        </nav>
 
         <h2>Game Boxes for board generation</h2>
         <p>These are also used for encounter brief generation. To generate an encounter, at least one Game Box must be selected.</p>
@@ -54,11 +66,14 @@
         </table>
         
         <h2>Encounter Board</h2>
+        <p>If the option to generate a plane grid of 3x3 tiles is used, there must be enough encounter tiles available. This means, at least two boxes must be selected. Elsewise errors will occur.</p>
         <div class="controls">
             <label>Maximum number of tiles of board: <input type="number" id="tileCount" value="4" min="1"></label>
             <input type="checkbox" id="chain" name="chain" value="chain" onclick="differ('chain')"><label for="chain"> chain tiles</label>
             <input type="checkbox" id="arrangeRandom" name="arrangeRandom" value="arrangeRandom" onclick="differ('arrangeRandom')"><label for="arrangeRandom"> arrange tiles random</label>
             <input type="checkbox" id="mosaik" name="mosaik" value="mosaik" onclick="differ('mosaik')"><label for="mosaik"> arrange tiles plane</label>
+            <input type="checkbox" id="planeGrid2x2" name="planeGrid2x2" value="planeGrid2x2" onclick="differ('planeGrid2x2')"><label for="planeGrid2x2"> arrange tiles 2x2 (huge machine encounter)</label>
+            <input type="checkbox" id="planeGrid3x3" name="planeGrid3x3" value="planeGrid3x3" onclick="differ('planeGrid3x3')"><label for="planeGrid3x3"> arrange tiles 3x3 (huge machine encounter)</label>
           <button onclick="generateGrid()">generate board</button>
         </div>
 
@@ -102,7 +117,10 @@
                 <td><input type="checkbox" id="3-4" name="3-4" value="3-4" onclick="differ('3-4')"><label for="3-4"> 3-4 players</label><br></td>
             </tr>
         </table>
-        <button onclick="generateEncounterBriefV5()">generate encounter brief</button>
+        <div class="controls">
+            <input type="checkbox" id="dualEnemys" name="dualEnemys" value="dualEnemys"><label for="dualEnemys"> dual enemys</label>
+            <button onclick="generateEncounterBriefV6()">generate encounter brief</button>
+        </div>
         <p>Warning: the level of the generated encounter is not exactly matching those of the original encounters. Additionally, an encounter borad must have been generated before generating an encounter brief.</p>
         <h4 id="encounterLevel">Encounter Level</h4>
         <h4 id="encounterResources">Encounter Resources</h4>
@@ -113,18 +131,36 @@
             </table>
             <div id="difficultyBarContainer"></div>
         </div>
-		<button onclick="generateEncounterCard()">
-            <img src="system/resources/share.png" style="height: 30px;"><img>
-            Open as Encounter Card
-        </button>
 
-        <script src="system/script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+
+        <script src="system/scriptV2.js"></script>
+
+		<script>
+            function toggleDropdown(btn) {
+                // Alle anderen Dropdowns schließen (optional)
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    if (d !== btn.parentElement) d.classList.remove('show');
+                });
+
+                // Aktuelles Dropdown ein-/ausblenden
+                btn.parentElement.classList.toggle('show');
+            }
+
+            // Schließen, wenn außerhalb getippt wird
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.dropbtn')) {
+                    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+                }
+            });
+        </script>
     </main>
 
     <footer>
+        <p></p>
     </footer>
 </body>
-<!--
+	<!--
 /*
  * Dieses Programm ist freie Software: Sie können es unter den Bedingungen
  * der GNU Affero General Public License, wie von der Free Software Foundation,
@@ -159,6 +195,13 @@
  */
 -->
 </html>
+
+
+
+
+
+
+
 
 
 
