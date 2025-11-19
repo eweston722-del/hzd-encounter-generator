@@ -153,8 +153,6 @@ window.addEventListener('beforeunload', () => {
 //========== code ==========//
 const output = document.getElementById("output");
 output.style.position = "relative";
-output.style.width = "800px";
-output.style.height = "800px";
 
 const tileSize = 99;
 const third = tileSize / 3;
