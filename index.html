@@ -21,16 +21,15 @@
 	<link rel="apple-touch-icon" sizes="180x180" href="system/resources/favicon-180.png">
     <link rel="stylesheet" href="system/styles.css">
 </head>
+<header>
+    <img src="system/resources/title2.png">
+    <img src="system/resources/title3.png">
+</header>
 <body>
-    <header>
-        <img src="system/resources/title2.png">
-        <img src="system/resources/title3.png">
-    </header>
-
+    <h1 class="title">Encounter Generator</h1>
     <main>
         <nav class="nav">
             <img src="system/resources/title2.png" style="height: 40px;">
-            <h1 style="padding-left: 10px; padding-right: 10px;">Encounter Generator</h1>
             <div class="dropdown">
                 <div class="dropbtn" onclick="toggleDropdown(this)"></div>
                 <div class="dropdown-content">
@@ -64,7 +63,7 @@
                 <td><input type="checkbox" id="KS" name="KS" value="KS"><label for="KS"> Kickstarter Exclusives (cultists)</label><br></td>
             </tr>
         </table>
-        
+
         <h2>Encounter Board</h2>
         <p>If the option to generate a plane grid of 3x3 tiles is used, there must be enough encounter tiles available. This means, at least two boxes must be selected. Elsewise errors will occur.</p>
         <div class="controls">
@@ -82,7 +81,7 @@
         <button id="generateTerrain" onclick="generateTerrain()">generate terrain</button>
         <h4 id="terrainSquare">Terrain (square symbol)</h4>
         <h4 id="terrainTriangle">Terrain (triangle symbol)</h4>
-        
+
         <h2>Encounter Brief</h2>
         <h4>Encounter Brief Settings</h4>
         <table>
