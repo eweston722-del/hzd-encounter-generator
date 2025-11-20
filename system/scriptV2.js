@@ -1385,17 +1385,8 @@ function update() {
 function generateTerrain() {
     terrainA = getRandomTerrain();
     terrainB = getRandomTerrain();
-
-    if (terrainA == "") {
-        document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol) " + "-";
-    } else {
-        document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol) " + terrainA;
-    }
-    if (terrainB == "") {
-        document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + "-";
-    } else {
-        document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + terrainB;
-    }
+    document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol): " + ((terrainA == "") ? "-" : terrainA);
+    document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol): " + ((terrainB == "") ? "-" : terrainB);
 }
 
 function generateEncounterCard(withNumbers) {
@@ -1694,7 +1685,7 @@ function generateEncounterBriefV6() {
 
   // --- Resources ---
   resources = Math.floor(Math.random() * 6);
-  document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
+  document.getElementById("encounterResources").innerHTML = "Encounter Resources:" + resources;
 
   saveValuesToStorage();
 }

@@ -88,30 +88,41 @@
         <h2>Map Settings</h2>
         <div class="firstRow">
             <div class="col1">
-                <h2>Choose boxes</h2>
-                <table>
-                    <tr>
-                        <td><input type="checkbox" id="CG" name="CG" value="CG" onclick="update()"><label for="CG"> Core Game</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="SL" name="SL" value="SL" onclick="update()"><label for="SL"> Sacred Lands Expansion</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="FH" name="FH" value="FH" onclick="update()"><label for="FH"> Forge and Hammer Expansion</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="FW" name="FW" value="FW" onclick="update()"><label for="FW"> Frozen Wilds Expansion</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="SotS" name="SotS" value="SotS" onclick="update()"><label for="SotS"> Soldiers of the Sun Expansion</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="KS" name="KS" value="KS"><label for="KS"> Kickstarter Exclusives (cultists)</label><br></td>
-                    </tr>
-                </table>
-                <p class="explanation">These are also used for encounter brief generation. To generate an encounter, at least one Game Box must be selected.</p>
-                <h2>Encounter Board</h2>
-                <label>Maximum number of tiles of board:</label><input type="number" id="tileCount" value="4" min="1">
+                <h3>Choose boxes</h3>
+                <div>
+                    <div>
+                        <input type="checkbox" id="CG" name="CG" value="CG" onclick="update()">
+                        <label for="CG"> Core Game</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="SL" name="SL" value="SL" onclick="update()">
+                        <label for="SL"> Sacred Lands Expansion</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="FH" name="FH" value="FH" onclick="update()">
+                        <label for="FH"> Forge and Hammer Expansion</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="FW" name="FW" value="FW" onclick="update()">
+                        <label for="FW"> Frozen Wilds Expansion</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="SotS" name="SotS" value="SotS" onclick="update()">
+                        <label for="SotS"> Soldiers of the Sun Expansion</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="KS" name="KS" value="KS">
+                        <label for="KS"> Kickstarter Exclusives (cultists)</label>
+                    </div>
+                    <p class="explanation">You must select at least one box. Selected boxes are also used for the brief generation.</p>
+                </div>
+                <h3>Encounter board</h3>
+                <h4>Tiling settings</h4>
+
+                <div class="tileChoice">
+                    <label>Maximum number of tiles:</label>
+                    <input type="number" id="tileCount" value="4" min="1">
+                </div>
                 <div class="controls">
                     <div class="controlOption">
                         <input type="radio" id="chain" name="tiling" value="chain" onclick="differ('chain')">
@@ -134,11 +145,15 @@
                         <label for="planeGrid3x3">3x3</label>
                     </div>
                 </div>
-                <button onclick="generateGrid()">Generate board</button>
-                <p class="explanation">If the option to generate a plane grid of 3x3 tiles is used, there must be enough encounter tiles available. This means, at least two boxes must be selected. Elsewise errors will occur.</p>
-                <button id="generateTerrain" onclick="generateTerrain()">Generate terrain</button>
-                <h4 id="terrainSquare">Terrain (square symbol)</h4>
-                <h4 id="terrainTriangle">Terrain (triangle symbol)</h4>
+                <p class="explanation">You must select at least two boxes to generate a 3x3 board, otherwise errors may occur.</p>
+                <div class="generationButtons">
+                    <button onclick="generateGrid()">Generate board</button>
+                    <button id="generateTerrain" onclick="generateTerrain()">Generate terrain</button>
+                </div>
+
+                <h4>Terrain settings</h4>
+                <p id="terrainSquare">Terrain (square symbol):</p>
+                <p id="terrainTriangle">Terrain (triangle symbol):</p>
             </div>
 
             <div class="col2">
@@ -150,7 +165,7 @@
         <h2>Encounter brief</h2>
         <div class="secondRow">
             <div class="col3">
-                <h3>Encounter Brief Settings</h3>
+                <h3>Encounter brief Settings</h3>
                 <div class="settings">
                     <h4>Encounter level settings</h4>
                     <div class="setting">
@@ -200,12 +215,14 @@
                     </div>
 
                 </div>
-                <button onclick="generateEncounterBriefV6()">generate encounter brief</button>
+                <div class="generationButtons">
+                    <button onclick="generateEncounterBriefV6()">Generate encounter brief</button>
+                </div>
             </div>
             <div class="col4">
                 <h3>Encounter recap</h3>
-                <h4 id="encounterLevel">Encounter Level</h4>
-                <h4 id="encounterResources">Encounter Resources</h4>
+                <p id="encounterLevel">Encounter Level:</p>
+                <p id="encounterResources">Encounter Resources:</p>
                 <h4>Machine list</h4>
 
                 <div id="encounterBrief">

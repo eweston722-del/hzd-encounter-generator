@@ -61,7 +61,7 @@ body {
   text-align: center;
   color: #fffffc;
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 3rem;
 }
 
 header p {
@@ -86,16 +86,23 @@ main {
 
 main h2 {
   color: #3e475a;
-  font-size: 2rem;
+  font-size: 2.3rem;
   margin: 0;
   text-align: center;
 }
 
 main h3 {
   color: #3e475a;
-  font-size: 1.3rem;
+  font-size: 1.8rem;
   margin: 0;
   text-align: center;
+}
+
+main h4 {
+  color: #3e475a;
+  font-size: 1.3rem;
+  margin: 0;
+  text-align: left;
 }
 
 main p {
@@ -113,8 +120,14 @@ main p {
 }
 
 .col1 {
+  display: grid;
   width: 35%;
   justify-content: center;
+}
+
+.col1 button {
+  display: block;
+  width: 7rem;
 }
 
 .col2 {
@@ -178,11 +191,18 @@ footer a:hover {
   height: 10px;
 }
 
-.controls {
+.tileChoice {
   display: flex;
   flex-direction: row;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+.controls {
+  margin-top: 0.5rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  flex-direction: row;
   border: #333;
   border-width: 2px;
   border-style: solid;
@@ -196,6 +216,14 @@ footer a:hover {
 .controlOption:has(input[type="radio"]:checked) {
   background-color: #dbdbdb; /* highlight color */
   border-radius: 6px;
+}
+
+.generationButtons {
+  margin-top: 0.3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .controls input {
@@ -234,19 +262,19 @@ footer a:hover {
   padding: 2px;
 }
 .tile .tileName {
-    position: absolute;
-    bottom: 25px;
-    left: 33px;
-    font-size: 30px;
-    color: #fff;
-    text-align: center;
+  position: absolute;
+  bottom: 25px;
+  left: 33px;
+  font-size: 30px;
+  color: #fff;
+  text-align: center;
 }
 .tile .startingTileName {
-    position: absolute;
-    bottom: 25px;
-    left: 33px;
-    font-size: 30px;
-    text-align: center;
+  position: absolute;
+  bottom: 25px;
+  left: 33px;
+  font-size: 30px;
+  text-align: center;
 }
 
 .grid {
