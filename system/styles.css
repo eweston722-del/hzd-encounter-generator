@@ -278,6 +278,17 @@ td:nth-child(even), th:nth-child(even) {
   margin-bottom: 3rem;
 }
 
+.settings {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+
 .exportDiv {
   margin-top: 3rem;
 }

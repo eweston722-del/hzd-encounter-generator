@@ -151,41 +151,55 @@
         <div class="secondRow">
             <div class="col3">
                 <h3>Encounter Brief Settings</h3>
-                <table>
-                    <tr>
-                        <td><input type="checkbox" id="lvl4" name="lvl4" value="lvl4"><label for="lvl4"> Enable Level 4 encounter (huge machine encounter)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="lvl5" name="lvl5" value="lvl5"><label for="lvl5"> Enable Level 5 encounter (huge machine encounter with additional secondary enemys)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="TJ" name="TJ" value="TJ"><label for="TJ"> Thunderjaw Expansion (huge machine)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="SB" name="SB" value="SB"><label for="SB"> Stormbird Expansion (huge machine)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="FC" name="FC" value="FC"><label for="FC"> Fireclaw Expansion (huge machine)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="RB" name="RB" value="RB"><label for="RB"> Rockbreaker Expansion (huge machine)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="HN" name="HN" value="HN"><label for="HN"> Heart of the Nora Expansion (huge machine and normal enemy)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="LB" name="LB" value="LB"><label for="LB"> The Lawless Badlands Expansion (bandits)</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="1-2" name="1-2" value="1-2" onclick="differ('1-2')"><label for="1-2"> 1-2 players</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="3-4" name="3-4" value="3-4" onclick="differ('3-4')"><label for="3-4"> 3-4 players</label><br></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" id="dualEnemys" name="dualEnemys" value="dualEnemys"><label for="dualEnemys"> dual enemys</label></td>
-                    </tr>
-                </table>
+                <div class="settings">
+                    <h4>Encounter level settings</h4>
+                    <div class="setting">
+                        <input type="checkbox" id="1-2" name="1-2" value="1-2" onclick="differ('1-2')">
+                        <label for="1-2">1-2 players</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="3-4" name="3-4" value="3-4" onclick="differ('3-4')">
+                        <label for="3-4">3-4 players</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="dualEnemys" name="dualEnemys" value="dualEnemys">
+                        <label for="dualEnemys">Dual enemies</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="lvl4" name="lvl4" value="lvl4">
+                        <label for="lvl4"> Enable level 4 encounters (huge machines)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="lvl5" name="lvl5" value="lvl5">
+                        <label for="lvl5"> Enable Level 5 encounters (huge machines with secondary enemies)</label>
+                    </div>
+                    <h4>Expansions settings</h4>
+                    <div class="setting">
+                        <input type="checkbox" id="TJ" name="TJ" value="TJ">
+                        <label for="TJ">Thunderjaw (Huge machine)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="SB" name="SB" value="SB">
+                        <label for="SB">Stormbird (Huge machine)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="FC" name="FC" value="FC">
+                        <label for="FC">Fireclaw (Huge machine)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="RB" name="RB" value="RB">
+                        <label for="RB">Rockbreaker (Huge machine)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="HN" name="HN" value="HN">
+                        <label for="HN">Heart of the Nora (huge machine and normal enemy)</label>
+                    </div>
+                    <div class="setting">
+                        <input type="checkbox" id="LB" name="LB" value="LB">
+                        <label for="LB">The Lawless Badlands (bandits)</label>
+                    </div>
+
+                </div>
                 <button onclick="generateEncounterBriefV6()">generate encounter brief</button>
             </div>
             <div class="col4">
