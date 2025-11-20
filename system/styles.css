@@ -28,7 +28,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2025 F.G. Schubert
+ * Copyright (C) 2025 F.G. Schubert & N. Truong
  */
 
 header {
@@ -91,15 +91,24 @@ main h2 {
   text-align: center;
 }
 
+main h3 {
+  color: #3e475a;
+  font-size: 1.3rem;
+  margin: 0;
+  text-align: center;
+}
+
 main p {
   font-size: 1.1rem;
   margin-bottom: 1rem;
 }
 
-.firstRow {
+.firstRow,
+.secondRow {
   display: flex;
   flex-direction: row;
-  padding: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
   justify-content: space-evenly;
 }
 
@@ -108,8 +117,22 @@ main p {
   justify-content: center;
 }
 
-.explaination {
+.col2 {
+  width: 60%;
+  aspect-ratio: 1;
+}
+
+.col3 {
+  width: 40%;
+}
+
+.col4 {
+  width: 50%;
+}
+
+.explanation {
   font-size: 0.8rem;
+  margin: 0.25rem;
 }
 
 footer {
@@ -226,11 +249,6 @@ footer a:hover {
     text-align: center;
 }
 
-.col2 {
-  width: 60%;
-  aspect-ratio: 1;
-}
-
 .grid {
   border-radius: 28px;
   display: grid;
@@ -256,25 +274,12 @@ td:nth-child(even), th:nth-child(even) {
     src: url('resources/Horizon-nMeM.ttf'); /* Pfad zur Schriftdatei */
 }
 
-.nav {
-  position: fixed; /* Positioniert das Element relativ zum Browserfenster */
-  top: 0;          /* Platziert das Element ganz oben am Fenster */
-  width: 100%;     /* Stellt sicher, dass die Leiste die gesamte Breite einnimmt */
-  background-color: #f0f0f058; /* Beispiel: Hintergrundfarbe */
-  background-image: url("resources/NavBarBG.png");
-  background-size: cover;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  border: #2d3436;
-  border-width: 2px;
-  border-radius: 10px;
-  padding: 2px;
+#encounterBrief {
+  margin-bottom: 3rem;
 }
 
-/* Optional: Verhindert, dass der Inhalt vom Menü überdeckt wird */
-body {
-  margin-top: 50px; /* Passt den oberen Abstand an die Höhe Ihrer Navigationsleiste an */
+.exportDiv {
+  margin-top: 3rem;
 }
 
 /* Dropdown Button */
