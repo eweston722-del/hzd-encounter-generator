@@ -236,16 +236,22 @@
 
             </div>
         </div>
-        <div class="exportDiv">
+
+        <div class="exportRow">
+            <h2>Export encounter</h2>
             <!-- <img src="system/resources/title2.png" style="height: 40px;"> -->
-            <div class="dropdown">
-                <div class="dropbtn" onclick="toggleDropdown(this)"></div>
-                <div class="dropdown-content">
-                    <a onclick="generateEncounterCard(false)">open as Encounter Card</a>
-                    <a onclick="generateEncounterCard(true)">open as Encounter Card with enemy numbers</a>
-                    <a onclick="copyLink(false)">copy Encounter Card link to clipboard</a>
-                    <a onclick="copyLink(true)">copy Encounter Card with enemy numbers link to clipboard</a>
-                </div>
+            <div class="setting">
+                <input type="checkbox" id="includeNumbers" name="includeNumbers" value="1">
+                <label for="includeNumbers">Generate card with numbers</label>
+            </div>
+            <!-- <div class="dropbtn" onclick="toggleDropdown(this)"></div>
+            <div class="dropdown-content">
+                <a onclick=>open as Encounter Card</a>
+                <a onclick=>copy Encounter Card link to clipboard</a>
+            </div> -->
+            <div class="generationButtons">
+                <button onclick="generateEncounterCard(document.getElementById('includeNumbers').checked)">Open as Encounter Card</button>
+                <button onclick="copyLink(document.getElementById('includeNumbers').checked)">Copy Encounter Card link to clipboard</button>
             </div>
         </div>
 
