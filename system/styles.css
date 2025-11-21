@@ -278,15 +278,16 @@ footer a:hover {
 }
 
 .grid {
-  border-radius: 28px;
   display: grid;
+  border-radius: 28px;
   gap: 4px;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   background: #2d3436;
   width: 100%;
   aspect-ratio: 1;
-  /* height: 40rem; */
 }
+
+
 
 td:nth-child(even), th:nth-child(even) {
   background-color: #D6EEEE;
