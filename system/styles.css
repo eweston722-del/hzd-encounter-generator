@@ -304,7 +304,7 @@ td:nth-child(even), th:nth-child(even) {
 }
 
 #encounterBrief {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .settings {
@@ -322,4 +322,11 @@ td:nth-child(even), th:nth-child(even) {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+#terrainSquare,
+#terrainTriangle,
+#encounterLevel,
+#encounterResources {
+  margin: 0rem;
 }

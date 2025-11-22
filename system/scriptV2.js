@@ -1435,7 +1435,7 @@ function generateEncounterBriefV6() {
 
   // --- Resources ---
   resources = Math.floor(Math.random() * 6);
-  document.getElementById("encounterResources").innerHTML = "Encounter Resources:" + resources;
+  document.getElementById("encounterResources").innerHTML = "Encounter Resources: " + resources;
 
   saveValuesToStorage();
 }
