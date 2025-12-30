@@ -187,7 +187,9 @@
       <img id="dualSymbolB" class="dual-symbol" src="" alt="">
     </div>
 
-    <div id="tileField"></div>
+    <div id="tileField">
+      <div id="tileWrapper"></div>
+    </div>
   </div>
 
   <script>
@@ -372,8 +374,53 @@
     setTerrainSymbol("squareOverlay", terrainA);
     setTerrainSymbol("triangleOverlay", terrainB);
 
+	// Hilfsfunktion
+    function normalizeGeneratedTiles(tileWrapper, output) {
+      // niemals auf transformiertem Zustand messen
+      tileWrapper.style.transform = "none";
+
+      const tiles = [...tileWrapper.children];
+      if (tiles.length === 0) return;
+
+      let minX = Infinity, minY = Infinity;
+      let maxX = -Infinity, maxY = -Infinity;
+
+      tiles.forEach(tile => {
+        const x = tile.offsetLeft;
+        const y = tile.offsetTop;
+        const w = tile.offsetWidth;
+        const h = tile.offsetHeight;
+
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + w);
+        maxY = Math.max(maxY, y + h);
+      });
+
+      const contentWidth  = maxX - minX;
+      const contentHeight = maxY - minY;
+      if (contentWidth <= 0 || contentHeight <= 0) return;
+
+      const padding = 20;
+      const outputRect = output.getBoundingClientRect();
+
+      const scale = Math.min(
+        (outputRect.width  - padding * 2) / contentWidth,
+        (outputRect.height - padding * 2) / contentHeight
+      );
+
+      const translateX =
+        (outputRect.width  - contentWidth  * scale) / 2 - minX * scale;
+      const translateY =
+        (outputRect.height - contentHeight * scale) / 2 - minY * scale;
+
+      tileWrapper.style.transform =
+        `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+	  
     // Feld
     const tileField = document.getElementById("tileField");
+	  const tileWrapper = document.getElementById("tileWrapper");
     const fieldWidth = tileField.clientWidth || 630;
     const fieldHeight = tileField.clientHeight || 500;
 
@@ -410,7 +457,7 @@
       // Pixelgröße einer ganzen Tile (3 Drittel)
       const tilePixelSize = 3 * cellSize;
 
-      tileField.innerHTML = "";
+      tileWrapper.innerHTML = "";
 
       placedTileList.forEach((entry, index) => {
         const entryTileObj = entry.tile;
@@ -459,8 +506,9 @@
 
         tileDiv.appendChild(label);
 
-        tileField.appendChild(tileDiv);
+        tileWrapper.appendChild(tileDiv);
       });
+	  normalizeGeneratedTiles(tileWrapper, tileField);
     }
   </script>
   <!--
@@ -499,6 +547,7 @@
 -->
 </body>
 </html>
+
 
 
 

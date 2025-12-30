@@ -1,0 +1,185 @@
+/*
+ * Dieses Programm ist freie Software: Sie können es unter den Bedingungen
+ * der GNU General Public License, wie von der Free Software Foundation,
+ * Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version,
+ * weiterverbreiten und/oder modifizieren.
+ *
+ * Dieses Programm wird in der Hoffnung verteilt, dass es nützlich sein wird,
+ * jedoch OHNE JEDE GEWÄHRLEISTUNG; sogar ohne die implizite Gewährleistung
+ * der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+ * Siehe die GNU General Public License für weitere Details.
+ *
+ * Eine Kopie der GNU General Public License sollten Sie zusammen mit
+ * diesem Programm erhalten haben. Falls nicht, siehe <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+
+/* ========= GLOBAL ========= */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'OitaRegular', serif;
+}
+
+/* ========= CARD ========= */
+
+#tallneckCard {
+  position: relative;
+  width: 853px;
+  height: 1280px;
+  background-image: url("resources/style elements/tallneck_card_bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-sizing: border-box;
+}
+
+/* ========= TITLE ========= */
+
+#tallneckTitle {
+  position: absolute;
+  top: 130px;
+  width: 100%;
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0,0,0,0.8);
+}
+
+/* ========= BOARD ========= */
+
+#boardContainer {
+  position: absolute;
+  top: 230px; /* Abstand unter Titel */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#boardCanvas {
+  width: 600px;
+  height: 400px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 6px;
+}
+
+/* ========= TABLE ========= */
+
+#tableContainer {
+  position: absolute;
+  top: 670px; /* 230 + 400 + 40 Abstand */
+  left: 80px;
+  right: 80px;
+  bottom: 80px;
+  overflow-y: auto;
+}
+
+#tallneckTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+  font-size: 18px;
+}
+
+#tallneckTable th {
+  text-align: left;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(255,255,255,0.5);
+}
+
+#tallneckTable td {
+  padding: 8px 4px;
+  vertical-align: top;
+}
+
+#tallneckTable tr:not(:first-child):nth-child(even) {
+  background: rgba(255,255,255,0.05);
+}
+
+#tallneckBoard {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  overflow: hidden;
+}
+
+#boardContainer {
+  width: 600px;
+  height: 400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#tallneckBoardWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+}
+
+
+.tile {
+  width: 99px;
+  height: 99px;
+  border: 1px solid #333;
+  margin: 2px;
+  position: relative;
+  
+  text-align: center;
+  align-items: center;
+}
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.tile .debug {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px;
+}
+.tile .tileName {
+    position: absolute;
+    bottom: 25px;
+    left: 33px;
+    font-size: 30px;
+    color: #fff;
+    text-align: center;
+}
+.tile .startingTileName {
+    position: absolute;
+    bottom: 25px;
+    left: 33px;
+    font-size: 30px;
+    text-align: center;
+
+}

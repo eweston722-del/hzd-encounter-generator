@@ -1,3 +1,36 @@
+/*
+ * Dieses Programm ist freie Software: Sie können es unter den Bedingungen
+ * der GNU General Public License, wie von der Free Software Foundation,
+ * Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version,
+ * weiterverbreiten und/oder modifizieren.
+ *
+ * Dieses Programm wird in der Hoffnung verteilt, dass es nützlich sein wird,
+ * jedoch OHNE JEDE GEWÄHRLEISTUNG; sogar ohne die implizite Gewährleistung
+ * der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+ * Siehe die GNU General Public License für weitere Details.
+ *
+ * Eine Kopie der GNU General Public License sollten Sie zusammen mit
+ * diesem Programm erhalten haben. Falls nicht, siehe <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+
 //========== storage declaration ==========//
 let boardGameBoxes = { CG: false, SL: false, FH: false, FW: false, SotS: false};
 let encounterBriefSettings = { lvl4: false, lvl5: false, TJ: false, SB: false, FC: false, RB: false, HN: false, KS: false, LB: false, oneToTwo: false, threeToFour: false};
@@ -41,7 +74,7 @@ function loadValuesFromStorage() {
     document.getElementById("arrangeRandom").checked = encounterGeneratorGlobalSettings.arrangeRandom;
     document.getElementById("mosaik").checked = encounterGeneratorGlobalSettings.mosaik;
 
-    document.getElementById("output").innerHTML = JSON.parse(localStorage.getItem('output')) || "";
+    //document.getElementById("output").innerHTML = JSON.parse(localStorage.getItem('output')) || "";
 
     variables = JSON.parse(localStorage.getItem('variables')) || default_variables;
     hugeMachines = variables.hugeMachines;
@@ -145,6 +178,22 @@ function saveValuesToStorage() {
     localStorage.setItem("resources", JSON.stringify(resources));
     localStorage.setItem("terrainA", JSON.stringify(terrainA));
     localStorage.setItem("terrainB", JSON.stringify(terrainB));
+
+    const boardState = {
+        placedTileList,   // { tileId, x, y, rot }
+        terrainA,
+        terrainB,
+        resources
+    };
+    localStorage.setItem("boardState", JSON.stringify(boardState));
+
+    // new
+    localStorage.setItem("boardState", JSON.stringify({
+        placedTileList,
+        terrainA,
+        terrainB,
+        resources
+    }));
 }
 window.addEventListener('beforeunload', () => {
     saveValuesToStorage()
@@ -152,7 +201,10 @@ window.addEventListener('beforeunload', () => {
 
 //========== code ==========//
 const output = document.getElementById("output");
+const tileWrapper = document.getElementById("tileWrapper");
 output.style.position = "relative";
+
+let normalizeToken = 0;
 
 const tileSize = 99;
 const third = tileSize / 3;
@@ -233,6 +285,25 @@ function getRandomTerrain() {
 }
 
 loadValuesFromStorage();
+//restoreBoardFromState();
+let restoredOnce = false;
+
+function restoreBoardFromState() {
+  if (restoredOnce) return;
+  restoredOnce = true;
+
+  const state = JSON.parse(localStorage.getItem("boardState"));
+  if (!state) return;
+
+  tileWrapper.innerHTML = "";
+
+  // ⚠️ NUR visuell zeichnen
+  for (const entry of state.placedTileList) {
+    tileWrapper.appendChild(
+      createTileElement(entry.tile, entry.rot, entry.x, entry.y)
+    );
+  }
+}
 
 machineDefinitions = [];
 createMachineDefinitions();
@@ -334,6 +405,9 @@ function createTileDefinitions() {
         tileSpawnPoints.push({id: "8K", spawnPoint: "B"}) // SPAWPOINTS A & B & C
     }
 }
+
+restoreBoardFromState();
+normalizeGeneratedTiles();
 
 function createMachineDefinitions() {
     machineDefinitions = [];
@@ -486,6 +560,9 @@ function createTileElement(tile, rotation, leftPx, topPx) {
     div.style.left = `${leftPx*third}px`;
     div.style.top = `${topPx*third}px`;
 
+    div.style.width = tileSize + "px";
+    div.style.height = tileSize + "px";
+
     const img = document.createElement("img");
     img.src = "system/resources/standard tile_standard.jpg";
     img.style.transform = `rotate(${rotation*90}deg)`;
@@ -511,6 +588,9 @@ function createStartingTileElement(tile, rotation, leftPx, topPx) {
     div.style.left = `${leftPx*third}px`;
     div.style.top = `${topPx*third}px`;
 
+    div.style.width = tileSize + "px";
+    div.style.height = tileSize + "px";
+
     const img = document.createElement("img");
     img.src = "system/resources/starting tile_standard.jpg";
     img.style.transform = `rotate(${rotation*90}deg)`;
@@ -530,87 +610,158 @@ function createStartingTileElement(tile, rotation, leftPx, topPx) {
 }
 
 function generateGrid() {
-    // FIX: Definitions und Listen pro Run zurücksetzen
-    tileDefinitions = [];
-    machines = [];
-    hugeMachines = [];
+    const myToken = ++normalizeToken;
 
-    createTileDefinitions();
-    createMachineDefinitions();
-        
-    const tileCount = parseInt(document.getElementById("tileCount").value, 10);
+    // ABSOLUT WICHTIG
+    tileWrapper.innerHTML = "";
 
-    output.innerHTML = "";
-
-    //const tileSize = 100;
-    //const third = tileSize / 3;
-
-    //    const usedTileIds = new Set();
-    //    const placedTiles = {};
-    //    const toPlace = [];
-        
     usedTileIds = new Set();
-    placedTiles = {}; // Map: belegte Gitterzellen
-    placedTileList = []; // Liste für Random-Auswahl
+    placedTiles = {};
+    placedTileList = [];
     toPlace = [];
 
-    // --- Starttile wählen & platzieren ---
-    const startDef = tileDefinitions[Math.floor(Math.random() * tileDefinitions.length)];
-    let base = parseTile(startDef);
-    usedTileIds.add(base.id);
+    // optional: gespeichertes Board verwerfen
+    localStorage.removeItem("boardState");
 
-    for (const specialTileID of specialTiles) {
-        if (base.id == specialTileID) {
-            if (specialTileID == "1K") usedTileIds.add("5K");
-            if (specialTileID == "2K") usedTileIds.add("6K");
-            if (specialTileID == "3K") usedTileIds.add("7K");
-            if (specialTileID == "4K") usedTileIds.add("8K");
-            
-            if (specialTileID == "5K") usedTileIds.add("1K");
-            if (specialTileID == "6K") usedTileIds.add("2K");
-            if (specialTileID == "7K") usedTileIds.add("3K");
-            if (specialTileID == "8K") usedTileIds.add("4K");
-        }
-    }
+    restoredOnce = true; // verhindert erneutes Restore
 
-    //placedTiles["0,0"] = { ...base, rotation: 0, posX: 0, posY: 0 };
+  // --- Reset ---
+  tileDefinitions = [];
+  machines = [];
+  hugeMachines = [];
 
-    // arbeiten im 3er-Gitter (x,y je Drittel)
-    let baseX = 9;
-    let baseY = 9;
-    let baseRot = 0;
-    let baseMatrixRot = base.matrix; // aktuell rotierte Matrix des Base-Tiles
+  createTileDefinitions();
+  createMachineDefinitions();
 
-    output.appendChild(createStartingTileElement(base, baseRot, baseX, baseY));
-    //placedTiles[posKey(baseX, baseY)] = { id: base.id, matrix: baseMatrixRot, rot: baseRot, x: baseX, y: baseY };
-    occupyCells(base.id, baseMatrixRot, baseRot, baseX, baseY);
-    placedTileList.push({ tile: base, x: baseX, y: baseY, rot: baseRot, matrix: baseMatrixRot });
+  const tileCount = parseInt(document.getElementById("tileCount").value, 10);
+  
+  // 🔴 KRITISCH: Wrapper vollständig resetten
+  tileWrapper.style.transform = "none";
+  tileWrapper.style.left = "0px";
+  tileWrapper.style.top = "0px";
 
-    //output.appendChild(createTileElement(base, 0, 0, 6));
-    //output.appendChild(createTileElement(base, 0, 3, 6));
+  // Jetzt erst DOM leeren
+  tileWrapper.innerHTML = "";
 
-    //toPlace.push({ x: 6, y: 6, tile: base, matrix: base.matrix, rotation: 0 });
+  usedTileIds = new Set();
+  placedTiles = {};
+  placedTileList = [];
+  toPlace = [];
 
-    //1. random: entry/exit point als Anpassungspunkt
-    //2. Bestimmung der Position des Anlegebereichs oben/rechts/unten/links
-    //3. Anhand des Anlagebereichs Berechnung der Grundkoordinate (+-3 entlang der jeweiligen Achse von der Grundkoordinate des bereits gelegten Tiles)
-    //4. random: tile welches bisher noch nicht verwendet wurde und eintragen als verwendet
-    //5. Bestimmung der Drehrichtung des anzulegenden Tiles (1 -> 2 bzw. 2 -> 1) indem Position des entry/exit points bestimmt wird und mit der Drehrichtung des vorher gelegten Tiles verglichen wird
-    //6. Position des entry/exit points beider Tiles bestimmen (xPos bei oben/unten bzw. yPos bei rechts/links als Anlagebereich)
-    //7. Versatz der entry/exit points berechnen und in der x bzw. y Position des anzulegenden Tiles einberechnen
-    //8. Tile generieren (x, y, rot)
+  // --- Starttile ---
+  const startDef = tileDefinitions[Math.floor(Math.random() * tileDefinitions.length)];
+  let base = parseTile(startDef);
+  usedTileIds.add(base.id);
 
-    if (document.getElementById("chain").checked == true) {
-        chain(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
-    } else if (document.getElementById("arrangeRandom").checked == true) {
-        arrangeRandom(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
-    } else if (document.getElementById("planeGrid2x2").checked == true) {
-        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2")
-    } else if (document.getElementById("planeGrid3x3").checked == true) {
-        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3")
+  let baseX = 9;
+  let baseY = 9;
+  let baseRot = 0;
+  let baseMatrixRot = base.matrix;
+
+  tileWrapper.appendChild(
+    createStartingTileElement(base, baseRot, baseX, baseY)
+  );
+
+  occupyCells(base.id, baseMatrixRot, baseRot, baseX, baseY);
+  placedTileList.push({ tile: base, x: baseX, y: baseY, rot: baseRot, matrix: baseMatrixRot });
+
+  // --- Restliche Tiles ---
+  if (document.getElementById("chain").checked) {
+    chain(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  } else if (document.getElementById("arrangeRandom").checked) {
+    arrangeRandom(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  } else if (document.getElementById("planeGrid2x2").checked) {
+    planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2");
+  } else if (document.getElementById("planeGrid3x3").checked) {
+    planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3");
+  } else {
+    mosaik(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  }
+
+  //console.log("generated grid");
+
+  // ⬇️ GANZ WICHTIG
+  //requestAnimationFrame(normalizeGeneratedTiles);
+    /*waitForTileImages(() => {
+        requestAnimationFrame(() => {
+            normalizeGeneratedTiles();
+        });
+    });*/
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+
+      // Falls inzwischen ein neuer Klick passiert ist → abbrechen
+      if (myToken !== normalizeToken) return;
+
+      normalizeGeneratedTiles();
+    });
+  });
+}
+
+function normalizeGeneratedTiles() {
+
+  // niemals auf transformiertem Zustand messen
+  tileWrapper.style.transform = "none";
+
+  const tiles = [...tileWrapper.children];
+  if (tiles.length === 0) return;
+
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  tiles.forEach(tile => {
+    const x = tile.offsetLeft;
+    const y = tile.offsetTop;
+    const w = tile.offsetWidth;
+    const h = tile.offsetHeight;
+
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + w);
+    maxY = Math.max(maxY, y + h);
+  });
+
+  const contentWidth  = maxX - minX;
+  const contentHeight = maxY - minY;
+  if (contentWidth <= 0 || contentHeight <= 0) return;
+
+  const padding = 20;
+  const outputRect = output.getBoundingClientRect();
+
+  const scale = Math.min(
+    (outputRect.width  - padding * 2) / contentWidth,
+    (outputRect.height - padding * 2) / contentHeight
+  );
+
+  const translateX =
+    (outputRect.width  - contentWidth  * scale) / 2 - minX * scale;
+  const translateY =
+    (outputRect.height - contentHeight * scale) / 2 - minY * scale;
+
+  tileWrapper.style.transform =
+    `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
+function waitForTileImages(callback) {
+  const images = tileWrapper.querySelectorAll("img");
+  let remaining = images.length;
+
+  if (remaining === 0) {
+    callback();
+    return;
+  }
+
+  images.forEach(img => {
+    if (img.complete && img.naturalWidth !== 0) {
+      remaining--;
     } else {
-        mosaik(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+      img.onload = img.onerror = () => {
+        remaining--;
+        if (remaining === 0) callback();
+      };
     }
+  });
+
+  if (remaining === 0) callback();
 }
 
 function occupyCells(tileId, matrix, rot, x, y) {
@@ -1438,4 +1589,27 @@ function generateEncounterBriefV6() {
   document.getElementById("encounterResources").innerHTML = "Encounter Resources: " + resources;
 
   saveValuesToStorage();
+}
+
+function openTallneckMode() {
+    saveValuesToStorage();
+
+    const settings = JSON.parse(localStorage.getItem("encounterGeneratorGlobalSettings"));
+
+    if (!settings || settings.chain !== true) {
+        alert('Tallneck Mode requires a board generated with "chain tiles".');
+        return;
+    }
+
+    const variables = JSON.parse(localStorage.getItem("variables")) || {};
+
+    const data = {
+        placedTileList: JSON.parse(localStorage.getItem("placedTileList")) || [],
+        tileSpawnPoints: variables.tileSpawnPoints || [],
+        machines: variables.machines || [],
+        machineDefinitions: variables.machineDefinitions || []   // ✅ WICHTIG
+    };
+
+    const hash = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+    window.open(`https://eweston722-del.github.io/hzd-encounter-generator/tallneckMode.html#${hash}`, "_blank");
 }
