@@ -264,3 +264,136 @@ body {
   background-color: #54575f;
   background-size: cover;
 }
+
+/* neue CSS für automatische Zentrierung & Skalierung*/
+
+#tileWrapper {
+  transition: transform 0.25s ease;
+}
+
+#output {
+  position: relative;
+  width: 800px;
+  height: 800px;
+  background: #2d3436;
+  overflow: hidden;
+
+  /* GANZ WICHTIG */
+  display: block;
+}
+
+#tileWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  /* nur zur Sicherheit */
+  width: auto;
+  height: auto;
+
+  transform-origin: 0 0;
+}
+
+#tallneckBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  width: 200px;
+  height: fit-content;
+}
+
+#tallneckBtn img {
+  width: 100%; /* anpassen */
+  transition: opacity 0.3s ease;
+  display: block;
+}
+
+#tallneckBtn:hover img {
+  opacity: 0.6;
+}
+
+#tallneckBtn span {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'OitaRegular';
+  font-weight: bold;
+  color: white;
+  font-size: 20px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  pointer-events: none;
+}
+
+#tallneckBtn .name {
+  position: absolute;
+  width: 100%;
+  bottom: 53%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'OitaRegular';
+  font-weight: bold;
+  color: white;
+  font-size: 24px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  pointer-events: none;
+}
+
+#tallneckBtn .description {
+  position: absolute;
+  width: 100%;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'OitaRegular';
+  font-weight: bold;
+  color: white;
+  font-size: 18px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  pointer-events: none;
+}
+
+#tallneckDesc {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  width: 400px;
+  height: fit-content;
+}
+
+#tallneckDesc img {
+  width: 100%; /* anpassen */
+  transition: opacity 0.3s ease;
+  display: block;
+}
+
+#tallneckDesc .name {
+  position: absolute;
+  width: 100%;
+  bottom: 53%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'OitaRegular';
+  font-weight: bold;
+  color: white;
+  font-size: 24px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  pointer-events: none;
+}
+
+#tallneckDesc .description {
+  position: absolute;
+  width: 96%;
+  top: 10px;
+  left: 10px;
+  font-family: 'OitaRegular';
+  font-weight: bold;
+  color: white;
+  font-size: 13px;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9);
+  pointer-events: none;
+}
