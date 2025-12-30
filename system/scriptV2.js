@@ -1,3 +1,36 @@
+/*
+ * Dieses Programm ist freie Software: Sie können es unter den Bedingungen
+ * der GNU General Public License, wie von der Free Software Foundation,
+ * Version 3 der Lizenz oder (nach Ihrer Wahl) jeder späteren Version,
+ * weiterverbreiten und/oder modifizieren.
+ *
+ * Dieses Programm wird in der Hoffnung verteilt, dass es nützlich sein wird,
+ * jedoch OHNE JEDE GEWÄHRLEISTUNG; sogar ohne die implizite Gewährleistung
+ * der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+ * Siehe die GNU General Public License für weitere Details.
+ *
+ * Eine Kopie der GNU General Public License sollten Sie zusammen mit
+ * diesem Programm erhalten haben. Falls nicht, siehe <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2025 F.G. Schubert
+ */
+
 //========== storage declaration ==========//
 let boardGameBoxes = { CG: false, SL: false, FH: false, FW: false, SotS: false};
 let encounterBriefSettings = { lvl4: false, lvl5: false, TJ: false, SB: false, FC: false, RB: false, HN: false, KS: false, LB: false, oneToTwo: false, threeToFour: false};
@@ -145,6 +178,14 @@ function saveValuesToStorage() {
     localStorage.setItem("resources", JSON.stringify(resources));
     localStorage.setItem("terrainA", JSON.stringify(terrainA));
     localStorage.setItem("terrainB", JSON.stringify(terrainB));
+
+    // new
+    localStorage.setItem("boardState", JSON.stringify({
+        placedTileList,
+        terrainA,
+        terrainB,
+        resources
+    }));
 }
 window.addEventListener('beforeunload', () => {
     saveValuesToStorage()
@@ -152,9 +193,12 @@ window.addEventListener('beforeunload', () => {
 
 //========== code ==========//
 const output = document.getElementById("output");
+const tileWrapper = document.getElementById("tileWrapper");
 output.style.position = "relative";
 output.style.width = "800px";
 output.style.height = "800px";
+
+let normalizeToken = 0;
 
 const tileSize = 99;
 const third = tileSize / 3;
@@ -235,6 +279,25 @@ function getRandomTerrain() {
 }
 
 loadValuesFromStorage();
+//restoreBoardFromState();
+let restoredOnce = false;
+
+function restoreBoardFromState() {
+  if (restoredOnce) return;
+  restoredOnce = true;
+
+  const state = JSON.parse(localStorage.getItem("boardState"));
+  if (!state) return;
+
+  tileWrapper.innerHTML = "";
+
+  // ⚠️ NUR visuell zeichnen
+  for (const entry of state.placedTileList) {
+    tileWrapper.appendChild(
+      createTileElement(entry.tile, entry.rot, entry.x, entry.y)
+    );
+  }
+}
 
 machineDefinitions = [];
 createMachineDefinitions();
@@ -336,6 +399,9 @@ function createTileDefinitions() {
         tileSpawnPoints.push({id: "8K", spawnPoint: "B"}) // SPAWPOINTS A & B & C
     }
 }
+
+restoreBoardFromState();
+normalizeGeneratedTiles();
 
 function createMachineDefinitions() {
     machineDefinitions = [];
@@ -532,6 +598,14 @@ function createStartingTileElement(tile, rotation, leftPx, topPx) {
 }
 
 function generateGrid() {
+    const myToken = ++normalizeToken;
+
+    // optional: gespeichertes Board verwerfen
+    localStorage.removeItem("boardState");
+
+    restoredOnce = true; // verhindert erneutes Restore
+
+    
     // FIX: Definitions und Listen pro Run zurücksetzen
     tileDefinitions = [];
     machines = [];
@@ -542,7 +616,13 @@ function generateGrid() {
         
     const tileCount = parseInt(document.getElementById("tileCount").value, 10);
 
-    output.innerHTML = "";
+    // 🔴 KRITISCH: Wrapper vollständig resetten
+      tileWrapper.style.transform = "none";
+      tileWrapper.style.left = "0px";
+      tileWrapper.style.top = "0px";
+    
+      // Jetzt erst DOM leeren
+      tileWrapper.innerHTML = "";
 
     //const tileSize = 100;
     //const third = tileSize / 3;
@@ -583,7 +663,7 @@ function generateGrid() {
     let baseRot = 0;
     let baseMatrixRot = base.matrix; // aktuell rotierte Matrix des Base-Tiles
 
-    output.appendChild(createStartingTileElement(base, baseRot, baseX, baseY));
+    tileWrapper.appendChild(createStartingTileElement(base, baseRot, baseX, baseY));
     //placedTiles[posKey(baseX, baseY)] = { id: base.id, matrix: baseMatrixRot, rot: baseRot, x: baseX, y: baseY };
     occupyCells(base.id, baseMatrixRot, baseRot, baseX, baseY);
     placedTileList.push({ tile: base, x: baseX, y: baseY, rot: baseRot, matrix: baseMatrixRot });
@@ -603,16 +683,70 @@ function generateGrid() {
     //8. Tile generieren (x, y, rot)
 
     if (document.getElementById("chain").checked == true) {
-        chain(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+        chain(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
     } else if (document.getElementById("arrangeRandom").checked == true) {
-        arrangeRandom(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+        arrangeRandom(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
     } else if (document.getElementById("planeGrid2x2").checked == true) {
-        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2")
+        planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2")
     } else if (document.getElementById("planeGrid3x3").checked == true) {
-        planeGrid(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3")
+        planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3")
     } else {
-        mosaik(tileDefinitions, tileCount, output, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+        mosaik(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
     }
+
+    requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+
+      // Falls inzwischen ein neuer Klick passiert ist → abbrechen
+      if (myToken !== normalizeToken) return;
+
+      normalizeGeneratedTiles();
+    });
+  });
+}
+
+function normalizeGeneratedTiles() {
+
+  // niemals auf transformiertem Zustand messen
+  tileWrapper.style.transform = "none";
+
+  const tiles = [...tileWrapper.children];
+  if (tiles.length === 0) return;
+
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  tiles.forEach(tile => {
+    const x = tile.offsetLeft;
+    const y = tile.offsetTop;
+    const w = tile.offsetWidth;
+    const h = tile.offsetHeight;
+
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + w);
+    maxY = Math.max(maxY, y + h);
+  });
+
+  const contentWidth  = maxX - minX;
+  const contentHeight = maxY - minY;
+  if (contentWidth <= 0 || contentHeight <= 0) return;
+
+  const padding = 20;
+  const outputRect = output.getBoundingClientRect();
+
+  const scale = Math.min(
+    (outputRect.width  - padding * 2) / contentWidth,
+    (outputRect.height - padding * 2) / contentHeight
+  );
+
+  const translateX =
+    (outputRect.width  - contentWidth  * scale) / 2 - minX * scale;
+  const translateY =
+    (outputRect.height - contentHeight * scale) / 2 - minY * scale;
+
+  tileWrapper.style.transform =
+    `translate(${translateX}px, ${translateY}px) scale(${scale})`;
 }
 
 function occupyCells(tileId, matrix, rot, x, y) {
@@ -1699,4 +1833,27 @@ function generateEncounterBriefV6() {
   document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
 
   saveValuesToStorage();
+}
+
+function openTallneckMode() {
+    saveValuesToStorage();
+
+    const settings = JSON.parse(localStorage.getItem("encounterGeneratorGlobalSettings"));
+
+    if (!settings || settings.chain !== true) {
+        alert('Tallneck Mode requires a board generated with "chain tiles".');
+        return;
+    }
+
+    const variables = JSON.parse(localStorage.getItem("variables")) || {};
+
+    const data = {
+        placedTileList: JSON.parse(localStorage.getItem("placedTileList")) || [],
+        tileSpawnPoints: variables.tileSpawnPoints || [],
+        machines: variables.machines || [],
+        machineDefinitions: variables.machineDefinitions || []   // ✅ WICHTIG
+    };
+
+    const hash = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+    window.open(`https://eweston722-del.github.io/hzd-encounter-generator/tallneckMode.html#${hash}`, "_blank");
 }
