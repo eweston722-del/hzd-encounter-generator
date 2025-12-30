@@ -152,41 +152,6 @@ main p {
   width: 50%;
 }
 
-@media screen and (max-width: 1100px) {
-
-  header {
-    max-width: 90%;
-  }
-
-  main {
-    max-width: 80%;
-  }
-
-  .bigRow {
-    flex-direction: column;
-  }
-
-  .col1, .col2, .col3, .col4 {
-    width: 100%;
-  }
-
-  .col1 {
-    margin-bottom: 1rem;
-  }
-
-  #difficultyBarContainer {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-@media screen and (max-width: 800px) {
-
-  main {
-    max-width: 90%;
-  }
-}
-
 .explanation {
   font-size: 0.8rem;
   margin: 0.25rem;
@@ -356,6 +321,8 @@ td:nth-child(even), th:nth-child(even) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 1.5rem;
+
 }
 
 #terrainSquare,
@@ -395,6 +362,15 @@ td:nth-child(even), th:nth-child(even) {
   transform-origin: 0 0;
 }
 
+.tallneckRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
 #tallneckBtn {
   background: none;
   border: none;
@@ -409,6 +385,7 @@ td:nth-child(even), th:nth-child(even) {
   width: 100%; /* anpassen */
   transition: opacity 0.3s ease;
   display: block;
+  min-width: 13rem;
 }
 
 #tallneckBtn:hover img {
@@ -457,37 +434,19 @@ td:nth-child(even), th:nth-child(even) {
 }
 
 #tallneckDesc {
-  background: none;
+  /* background: none; */
+  background: #f4f4f9 url('resources/style\ elements/description_clipped.png');
+  background-size: cover;
   border: none;
-  /* cursor: pointer; */
+  border-radius: 1rem;
+  padding: 1rem;
   position: relative;
-  padding: 0;
-  width: 400px;
   height: fit-content;
-}
-
-#tallneckDesc img {
-  width: 100%; /* anpassen */
-  transition: opacity 0.3s ease;
-  display: block;
-}
-
-#tallneckDesc .name {
-  position: absolute;
-  width: 100%;
-  bottom: 53%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'OitaRegular';
-  font-weight: bold;
-  color: white;
-  font-size: 24px;
-  text-shadow: 0 0 6px rgba(0,0,0,0.9);
-  pointer-events: none;
+  max-width: 50%;
 }
 
 #tallneckDesc .description {
-  position: absolute;
+  /* position: absolute; */
   width: 96%;
   top: 10px;
   left: 10px;
@@ -497,4 +456,49 @@ td:nth-child(even), th:nth-child(even) {
   font-size: 13px;
   text-shadow: 0 0 6px rgba(0,0,0,0.9);
   pointer-events: none;
+}
+
+@media screen and (max-width: 1100px) {
+
+  header {
+    max-width: 90%;
+  }
+
+  main {
+    max-width: 80%;
+  }
+
+  .bigRow {
+    flex-direction: column;
+  }
+
+  .col1, .col2, .col3, .col4 {
+    width: 100%;
+  }
+
+  .col1 {
+    margin-bottom: 1rem;
+  }
+
+  #difficultyBarContainer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .tallneckRow {
+    flex-direction: column;
+    justify-content: center;
+    gap: .5rem;
+  }
+
+  #tallneckDesc {
+    max-width: 80%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+
+  main {
+    max-width: 90%;
+  }
 }
