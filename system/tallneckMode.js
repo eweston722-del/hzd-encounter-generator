@@ -515,30 +515,65 @@ function normalizeGeneratedTiles(tileWrapper, output) {
 
 });*/
 
+function exportTallneckCardAsPNG() {
+  const card = document.getElementById("tallneckCard");
+
+  html2canvas(card, {
+    backgroundColor: null, // nutzt das CSS-Hintergrundbild
+    scale: 2,              // höhere Auflösung (empfohlen)
+    width: 853,
+    height: 1280,
+    useCORS: true          // wichtig für Hintergrundbild
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "tallneck_encounter_card.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    const output = document.getElementById("boardContainer");
-    output.style.position = "relative";
-    output.style.width = "600px";
-    output.style.height = "400px";
-    const tileWrapper = document.getElementById("tallneckBoardWrapper");
-    restoreBoardFromState(tileWrapper, placedTileList);
-    normalizeGeneratedTiles(tileWrapper, output);
 
-    const table = document.getElementById("tallneckTable");
-    placedTileList.forEach(entry => {
-        const tileId = entry.tile.id;
-        const spawnType = getSpawnTypeForTile(tileId);
-        const machines = generateMachinesForTile();
+  /* ===== BOARD ===== */
+  const output = document.getElementById("boardContainer");
+  const tileWrapper = document.getElementById("tallneckBoardWrapper");
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${tileId}</td>
-            <td>${spawnType}</td>
-            <td>${machines || "-"}</td>
-        `;
-        table.appendChild(row);
-    });
+  output.style.position = "relative";
+  output.style.width = "600px";
+  output.style.height = "400px";
+
+  restoreBoardFromState(tileWrapper, placedTileList);
+  normalizeGeneratedTiles(tileWrapper, output);
+
+  /* ===== TABELLE ===== */
+  const table = document.getElementById("tallneckTable");
+
+  placedTileList.forEach(entry => {
+    const tileId = entry.tile.id;
+    const spawnType = getSpawnTypeForTile(tileId);
+    const machines = generateMachinesForTile();
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${tileId}</td>
+      <td>${spawnType}</td>
+      <td>${machines || "-"}</td>
+    `;
+    table.appendChild(row);
+  });
+
+  /* ===== EXPORT ===== */
+  const card = document.getElementById("tallneckCard");
+
+  if (!card) {
+    console.error("❌ tallneckCard nicht gefunden");
+    return;
+  }
+
+  card.style.cursor = "pointer";
+
+  card.addEventListener("click", exportTallneckCardAsPNG);
+  card.addEventListener("touchend", exportTallneckCardAsPNG);
 });
 
 
