@@ -74,7 +74,7 @@ function loadValuesFromStorage() {
     document.getElementById("arrangeRandom").checked = encounterGeneratorGlobalSettings.arrangeRandom;
     document.getElementById("mosaik").checked = encounterGeneratorGlobalSettings.mosaik;
 
-    document.getElementById("output").innerHTML = JSON.parse(localStorage.getItem('output')) || "";
+    //document.getElementById("output").innerHTML = JSON.parse(localStorage.getItem('output')) || "";
 
     variables = JSON.parse(localStorage.getItem('variables')) || default_variables;
     hugeMachines = variables.hugeMachines;
@@ -178,6 +178,14 @@ function saveValuesToStorage() {
     localStorage.setItem("resources", JSON.stringify(resources));
     localStorage.setItem("terrainA", JSON.stringify(terrainA));
     localStorage.setItem("terrainB", JSON.stringify(terrainB));
+
+    const boardState = {
+        placedTileList,   // { tileId, x, y, rot }
+        terrainA,
+        terrainB,
+        resources
+    };
+    localStorage.setItem("boardState", JSON.stringify(boardState));
 
     // new
     localStorage.setItem("boardState", JSON.stringify({
@@ -554,6 +562,9 @@ function createTileElement(tile, rotation, leftPx, topPx) {
     div.style.left = `${leftPx*third}px`;
     div.style.top = `${topPx*third}px`;
 
+    div.style.width = tileSize + "px";
+    div.style.height = tileSize + "px";
+
     const img = document.createElement("img");
     img.src = "system/resources/standard tile_standard.jpg";
     img.style.transform = `rotate(${rotation*90}deg)`;
@@ -579,6 +590,9 @@ function createStartingTileElement(tile, rotation, leftPx, topPx) {
     div.style.left = `${leftPx*third}px`;
     div.style.top = `${topPx*third}px`;
 
+    div.style.width = tileSize + "px";
+    div.style.height = tileSize + "px";
+
     const img = document.createElement("img");
     img.src = "system/resources/starting tile_standard.jpg";
     img.style.transform = `rotate(${rotation*90}deg)`;
@@ -600,101 +614,82 @@ function createStartingTileElement(tile, rotation, leftPx, topPx) {
 function generateGrid() {
     const myToken = ++normalizeToken;
 
+    // ABSOLUT WICHTIG
+    tileWrapper.innerHTML = "";
+
+    usedTileIds = new Set();
+    placedTiles = {};
+    placedTileList = [];
+    toPlace = [];
+
     // optional: gespeichertes Board verwerfen
     localStorage.removeItem("boardState");
 
     restoredOnce = true; // verhindert erneutes Restore
 
-    
-    // FIX: Definitions und Listen pro Run zurücksetzen
-    tileDefinitions = [];
-    machines = [];
-    hugeMachines = [];
+  // --- Reset ---
+  tileDefinitions = [];
+  machines = [];
+  hugeMachines = [];
 
-    createTileDefinitions();
-    createMachineDefinitions();
-        
-    const tileCount = parseInt(document.getElementById("tileCount").value, 10);
+  createTileDefinitions();
+  createMachineDefinitions();
 
-    // 🔴 KRITISCH: Wrapper vollständig resetten
-      tileWrapper.style.transform = "none";
-      tileWrapper.style.left = "0px";
-      tileWrapper.style.top = "0px";
-    
-      // Jetzt erst DOM leeren
-      tileWrapper.innerHTML = "";
+  const tileCount = parseInt(document.getElementById("tileCount").value, 10);
+  
+  // 🔴 KRITISCH: Wrapper vollständig resetten
+  tileWrapper.style.transform = "none";
+  tileWrapper.style.left = "0px";
+  tileWrapper.style.top = "0px";
 
-    //const tileSize = 100;
-    //const third = tileSize / 3;
+  // Jetzt erst DOM leeren
+  tileWrapper.innerHTML = "";
 
-    //    const usedTileIds = new Set();
-    //    const placedTiles = {};
-    //    const toPlace = [];
-        
-    usedTileIds = new Set();
-    placedTiles = {}; // Map: belegte Gitterzellen
-    placedTileList = []; // Liste für Random-Auswahl
-    toPlace = [];
+  usedTileIds = new Set();
+  placedTiles = {};
+  placedTileList = [];
+  toPlace = [];
 
-    // --- Starttile wählen & platzieren ---
-    const startDef = tileDefinitions[Math.floor(Math.random() * tileDefinitions.length)];
-    let base = parseTile(startDef);
-    usedTileIds.add(base.id);
+  // --- Starttile ---
+  const startDef = tileDefinitions[Math.floor(Math.random() * tileDefinitions.length)];
+  let base = parseTile(startDef);
+  usedTileIds.add(base.id);
 
-    for (const specialTileID of specialTiles) {
-        if (base.id == specialTileID) {
-            if (specialTileID == "1K") usedTileIds.add("5K");
-            if (specialTileID == "2K") usedTileIds.add("6K");
-            if (specialTileID == "3K") usedTileIds.add("7K");
-            if (specialTileID == "4K") usedTileIds.add("8K");
-            
-            if (specialTileID == "5K") usedTileIds.add("1K");
-            if (specialTileID == "6K") usedTileIds.add("2K");
-            if (specialTileID == "7K") usedTileIds.add("3K");
-            if (specialTileID == "8K") usedTileIds.add("4K");
-        }
-    }
+  let baseX = 9;
+  let baseY = 9;
+  let baseRot = 0;
+  let baseMatrixRot = base.matrix;
 
-    //placedTiles["0,0"] = { ...base, rotation: 0, posX: 0, posY: 0 };
+  tileWrapper.appendChild(
+    createStartingTileElement(base, baseRot, baseX, baseY)
+  );
 
-    // arbeiten im 3er-Gitter (x,y je Drittel)
-    let baseX = 9;
-    let baseY = 9;
-    let baseRot = 0;
-    let baseMatrixRot = base.matrix; // aktuell rotierte Matrix des Base-Tiles
+  occupyCells(base.id, baseMatrixRot, baseRot, baseX, baseY);
+  placedTileList.push({ tile: base, x: baseX, y: baseY, rot: baseRot, matrix: baseMatrixRot });
 
-    tileWrapper.appendChild(createStartingTileElement(base, baseRot, baseX, baseY));
-    //placedTiles[posKey(baseX, baseY)] = { id: base.id, matrix: baseMatrixRot, rot: baseRot, x: baseX, y: baseY };
-    occupyCells(base.id, baseMatrixRot, baseRot, baseX, baseY);
-    placedTileList.push({ tile: base, x: baseX, y: baseY, rot: baseRot, matrix: baseMatrixRot });
+  // --- Restliche Tiles ---
+  if (document.getElementById("chain").checked) {
+    chain(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  } else if (document.getElementById("arrangeRandom").checked) {
+    arrangeRandom(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  } else if (document.getElementById("planeGrid2x2").checked) {
+    planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2");
+  } else if (document.getElementById("planeGrid3x3").checked) {
+    planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3");
+  } else {
+    mosaik(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
+  }
 
-    //output.appendChild(createTileElement(base, 0, 0, 6));
-    //output.appendChild(createTileElement(base, 0, 3, 6));
+  //console.log("generated grid");
 
-    //toPlace.push({ x: 6, y: 6, tile: base, matrix: base.matrix, rotation: 0 });
-
-    //1. random: entry/exit point als Anpassungspunkt
-    //2. Bestimmung der Position des Anlegebereichs oben/rechts/unten/links
-    //3. Anhand des Anlagebereichs Berechnung der Grundkoordinate (+-3 entlang der jeweiligen Achse von der Grundkoordinate des bereits gelegten Tiles)
-    //4. random: tile welches bisher noch nicht verwendet wurde und eintragen als verwendet
-    //5. Bestimmung der Drehrichtung des anzulegenden Tiles (1 -> 2 bzw. 2 -> 1) indem Position des entry/exit points bestimmt wird und mit der Drehrichtung des vorher gelegten Tiles verglichen wird
-    //6. Position des entry/exit points beider Tiles bestimmen (xPos bei oben/unten bzw. yPos bei rechts/links als Anlagebereich)
-    //7. Versatz der entry/exit points berechnen und in der x bzw. y Position des anzulegenden Tiles einberechnen
-    //8. Tile generieren (x, y, rot)
-
-    if (document.getElementById("chain").checked == true) {
-        chain(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
-    } else if (document.getElementById("arrangeRandom").checked == true) {
-        arrangeRandom(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
-    } else if (document.getElementById("planeGrid2x2").checked == true) {
-        planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "2x2")
-    } else if (document.getElementById("planeGrid3x3").checked == true) {
-        planeGrid(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList, "3x3")
-    } else {
-        mosaik(tileDefinitions, tileCount, tileWrapper, usedTileIds, placedTiles, toPlace, startDef, base, baseX, baseY, baseRot, baseMatrixRot, placedTileList);
-    }
-
-    requestAnimationFrame(() => {
+  // ⬇️ GANZ WICHTIG
+  //requestAnimationFrame(normalizeGeneratedTiles);
+    /*waitForTileImages(() => {
+        requestAnimationFrame(() => {
+            normalizeGeneratedTiles();
+        });
+    });*/
+  requestAnimationFrame(() => {
     requestAnimationFrame(() => {
 
       // Falls inzwischen ein neuer Klick passiert ist → abbrechen
@@ -747,6 +742,28 @@ function normalizeGeneratedTiles() {
 
   tileWrapper.style.transform =
     `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
+function waitForTileImages(callback) {
+  const images = tileWrapper.querySelectorAll("img");
+  let remaining = images.length;
+
+  if (remaining === 0) {
+    callback();
+    return;
+  }
+
+  images.forEach(img => {
+    if (img.complete && img.naturalWidth !== 0) {
+      remaining--;
+    } else {
+      img.onload = img.onerror = () => {
+        remaining--;
+        if (remaining === 0) callback();
+      };
+    }
+  });
+
+  if (remaining === 0) callback();
 }
 
 function occupyCells(tileId, matrix, rot, x, y) {
