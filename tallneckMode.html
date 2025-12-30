@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tallneck Mode</title>
+<!-- <link rel="stylesheet" href="system/styles.css"> -->
+<link rel="stylesheet" href="system/tallneckMode.css">
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<script src="system/tallneckMode.js"></script>
+</head>
+<body>
+
+<div id="tallneckCard">
+
+    <h1 id="tallneckTitle">TALLNECK MODE</h1>
+
+    <!-- <div id="boardContainer">
+        <canvas id="boardCanvas" width="600" height="400"></canvas>
+    </div> -->
+    <div id="boardContainer">
+      <div id="tallneckBoardWrapper"></div>
+    </div>
+
+    <div id="tableContainer">
+        <table id="tallneckTable">
+            <tr>
+                <th>Tile ID</th>
+                <th>Spawnpoint</th>
+                <th>Machines</th>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<!--
+┌───────────────────────────────┐
+│         TALLNECK MODE         │  ← 130px Abstand
+│                               │
+│       ┌──────────────┐        │
+│       │              │        │
+│       │   BOARD      │        │  ← 600×400
+│       │              │        │
+│       └──────────────┘        │
+│                               │
+│  Tile | Spawn | Machines      │
+│  1A   | A     | 1x grazer     │
+│  2A   | B     | 2x watcher    │
+│                               │
+└───────────────────────────────┘
+-->
+
+</body>
+</html>
