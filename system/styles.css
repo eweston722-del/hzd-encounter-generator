@@ -32,11 +32,16 @@
  */
 
 header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  max-width: 80%;
   background-size: 100%;
   color: #fff;
   padding: 1.5rem 0;
   text-align: center;
-  width: 100%;
 }
 
 body {
@@ -62,15 +67,6 @@ body {
   color: #fffffc;
   margin: 0;
   font-size: 3rem;
-}
-
-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: nowrap;
-  max-width: 80%;
 }
 
 header p {
@@ -158,6 +154,10 @@ main p {
 }
 
 @media screen and (max-width: 1100px) {
+
+  header {
+    max-width: 90%;
+  }
 
   main {
     max-width: 80%;
