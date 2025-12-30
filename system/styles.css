@@ -159,10 +159,12 @@ main p {
 
 footer {
   text-align: center;
-  padding: 1rem 0;
-  background: #2d3436;
+  padding: .8rem;
+  border-radius: 1rem;
+  background: rgb(44, 51, 53, .7);
+  backdrop-filter: blur(3px);
   color: #fff;
-  margin-top: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 footer p {
@@ -464,7 +466,7 @@ td:nth-child(even), th:nth-child(even) {
     max-width: 90%;
   }
 
-  main {
+  main, footer {
     max-width: 80%;
   }
 
@@ -498,7 +500,7 @@ td:nth-child(even), th:nth-child(even) {
 
 @media screen and (max-width: 800px) {
 
-  main {
+  main, footer {
     max-width: 90%;
   }
 }
