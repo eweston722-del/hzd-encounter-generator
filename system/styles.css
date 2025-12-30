@@ -119,8 +119,7 @@ main p {
   margin-bottom: 1rem;
 }
 
-.firstRow,
-.secondRow {
+.bigRow {
   display: flex;
   flex-direction: row;
   padding-top: 1.5rem;
@@ -163,7 +162,7 @@ main p {
     max-width: 80%;
   }
 
-  .firstRow, .secondRow {
+  .bigRow {
     flex-direction: column;
   }
 
@@ -460,7 +459,7 @@ td:nth-child(even), th:nth-child(even) {
 #tallneckDesc {
   background: none;
   border: none;
-  cursor: pointer;
+  /* cursor: pointer; */
   position: relative;
   padding: 0;
   width: 400px;
