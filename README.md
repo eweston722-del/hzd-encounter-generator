@@ -17,6 +17,7 @@ Custom encounter generator for Horizon Zero Dawn: the Board Game. It is able to 
 - added a Tallneck Mode (Concept originates from Cellsai and was posted in SFGs Discord channel #horizon)
 - generate Tallneck Mode encounter card
 - improved visuals of Tallneck Mode
+- added a download function for the Tallneck Mode: a click on the card now downloads it as a png image file
 
 ## Image Attributions
 
