@@ -203,8 +203,6 @@ window.addEventListener('beforeunload', () => {
 const output = document.getElementById("output");
 const tileWrapper = document.getElementById("tileWrapper");
 output.style.position = "relative";
-output.style.width = "800px";
-output.style.height = "800px";
 
 let normalizeToken = 0;
 
@@ -1263,256 +1261,6 @@ function renderDifficultyBar(diff) {
   container.appendChild(bar);
 }
 
-function generateEncounterBriefV4() {
-    createMachineDefinitions();
-
-    const levelIndicator = document.getElementById("encounterLevel");
-    const machineList = document.getElementById("machineList");
-    let tableInnerHtml = "";
-    let encounterLevel = 0;
-
-    // --- Level zufällig bestimmen ---
-    if (document.getElementById("lvl4").checked && document.getElementById("lvl5").checked) {
-        encounterLevel = Math.floor(Math.random() * 5) + 1; // 1-5
-    } else if (document.getElementById("lvl4").checked) {
-        encounterLevel = Math.floor(Math.random() * 4) + 1; // 1-4
-    } else if (document.getElementById("lvl5").checked) {
-        encounterLevel = Math.floor(Math.random() * 5) + 1;
-        if (encounterLevel === 4) encounterLevel = 3;
-    } else {
-        encounterLevel = Math.floor(Math.random() * 3) + 1;
-    }
-
-    // --- Spieleranzahl bestimmen ---
-    const is12Players = document.getElementById("1-2").checked;
-    const is34Players = document.getElementById("3-4").checked;
-    const spawnFactor = is12Players ? 1 : (is34Players ? 2 : 1);
-
-    // --- Maschinen für Primär / Sekundär ---
-    chosenPrimary = null;
-    chosenSecondary = null;
-
-    // Zähler für globale Maschinenanzahl
-    const usedMachinesCount = {};
-
-    // Tiles durchgehen
-    let primaryTotalCount = 0;
-    let secondaryTotalCount = 0;
-    const enemyDiffs = [];
-
-    let primaryMax = 0;
-    let secondaryMax = 0;
-
-    // Für jede Tile prüfen, welcher Spawnpoint A/B und Maschinenanzahl möglich
-    for (const tile of tileSpawnPoints) {
-        const spawnPoint = tile.spawnPoint; // A oder B
-
-        // Filtern gültige Maschinen für Level
-        const validMachines = machineDefinitions.map(def => {
-            const [nameType, levelData] = def.split(":");
-            const parts = nameType.split(".");
-            const name = parts.slice(0, -3).join(".");
-            const amount = parseInt(parts[parts.length - 3], 10);
-            const difficultyModifier = parseInt(parts[parts.length - 2], 10);
-            const shared = parts[parts.length - 1];
-            const levels = levelData.split(";").map(v => {
-                const nums = v.replace(/[()]/g, "").split(",");
-                return { primary: parseInt(nums[0]) || 0, secondary: parseInt(nums[1]) || 0 };
-            });
-            return { name, amount, difficultyModifier, shared, levels };
-        });
-
-        // --- Primär Enemy ---
-        if (spawnPoint === "A") {
-            const candidates = validMachines.filter(m => {
-                let levelData = m.levels[encounterLevel - 1] || { primary: 0 };
-                return levelData.primary > 0;
-            });
-            if (candidates.length > 0) {
-                let machine = candidates[Math.floor(Math.random() * candidates.length)];
-                let levelData = machine.levels[encounterLevel - 1];
-                let maxAllowed = levelData.primary;
-                primaryMax = maxAllowed;
-                let used = usedMachinesCount[machine.name] || 0;
-                let count = Math.min(maxAllowed - used, spawnFactor, machine.amount - used);
-                if (count > 0) {
-                    usedMachinesCount[machine.name] = used + count;
-                    chosenPrimary = machine.name;
-                    primaryTotalCount += count;
-                    for (let k = 0; k < count; k++) enemyDiffs.push(machine.difficultyModifier); // pro Exemplar!
-                }
-            }
-        }
-
-        // --- Sekundär Enemy ---
-        if (spawnPoint === "B") {
-            const candidates = validMachines.filter(m => {
-                let levelData = m.levels[encounterLevel - 1] || { secondary: 0 };
-                return levelData.secondary > 0;
-            });
-            if (candidates.length > 0) {
-                let machine = candidates[Math.floor(Math.random() * candidates.length)];
-                let levelData = machine.levels[encounterLevel - 1];
-                let maxAllowed = levelData.secondary;
-                secondaryMax = maxAllowed;
-                let used = usedMachinesCount[machine.name] || 0;
-                let count = Math.min(maxAllowed - used, spawnFactor, machine.amount - used);
-                if (count > 0) {
-                    usedMachinesCount[machine.name] = used + count;
-                    chosenSecondary = machine.name;
-                    secondaryTotalCount += count;
-                    for (let k = 0; k < count; k++) enemyDiffs.push(machine.difficultyModifier); // pro Exemplar!
-                }
-            }
-        }
-    }
-
-    // --- Difficulty berechnen ---
-    let diff = 0;
-    if (enemyDiffs.length > 0) {
-        diff = parseFloat((enemyDiffs.reduce((a, b) => a + b, 0) / enemyDiffs.length).toFixed(2));
-    }
-
-    if (primaryTotalCount >= primaryMax) {
-        primaryTotalCount = primaryMax;
-    }
-    if (secondaryTotalCount >= secondaryMax) {
-        secondaryTotalCount = secondaryMax;
-    }
-
-    // --- Tabelle rendern ---
-    tableInnerHtml = `
-        <tr>
-            <th>Primary Enemy (A)</th><th>Count</th>
-            <th>Secondary Enemy (B)</th><th>Count</th>
-        </tr>
-        <tr>
-            <td>${chosenPrimary || "-"}</td>
-            <td>${primaryTotalCount}</td>
-            <td>${chosenSecondary || "-"}</td>
-            <td>${secondaryTotalCount}</td>
-        </tr>
-    `;
-
-    machineList.innerHTML = tableInnerHtml;
-    levelIndicator.innerHTML = "Encounter Level: " + encounterLevel;
-    renderDifficultyBar(diff);
-}
-
-function generateEncounterBriefV5() {
-    createMachineDefinitions();
-
-    const levelIndicator = document.getElementById("encounterLevel");
-    const machineList = document.getElementById("machineList");
-    let tableInnerHtml = "";
-
-    // --- Level zufällig bestimmen ---
-    if (document.getElementById("lvl4").checked && document.getElementById("lvl5").checked) {
-        encounterLevel = Math.floor(Math.random() * 5) + 1; // 1-5
-    } else if (document.getElementById("lvl4").checked) {
-        encounterLevel = Math.floor(Math.random() * 4) + 1; // 1-4
-    } else if (document.getElementById("lvl5").checked) {
-        encounterLevel = Math.floor(Math.random() * 5) + 1;
-        if (encounterLevel === 4) encounterLevel = 3;
-    } else {
-        encounterLevel = Math.floor(Math.random() * 3) + 1;
-    }
-
-    const is12Players = document.getElementById("1-2").checked;
-    const is34Players = document.getElementById("3-4").checked;
-    const spawnFactor = is12Players ? 1 : (is34Players ? 2 : 1);
-
-    chosenPrimary = null;
-    chosenSecondary = null;
-    let primaryTotalCount = 0;
-    let secondaryTotalCount = 0;
-    const enemyDiffs = [];
-
-    const usedMachinesCount = {};
-
-    // Gültige Maschinen für das Level vorbereiten
-    const validMachines = machineDefinitions.map(def => {
-        const [nameType, levelData] = def.split(":");
-        const parts = nameType.split(".");
-        const name = parts.slice(0, -3).join(".");
-        const amount = parseInt(parts[parts.length - 3], 10);
-        const difficultyModifier = parseInt(parts[parts.length - 2], 10);
-        const shared = parts[parts.length - 1];
-        const levels = levelData.split(";").map(v => {
-            const nums = v.replace(/[()]/g, "").split(",");
-            return { primary: parseInt(nums[0]) || 0, secondary: parseInt(nums[1]) || 0 };
-        });
-        return { name, amount, difficultyModifier, shared, levels };
-    });
-
-    // --- Primär Enemy ---
-    const primaryCandidates = validMachines.filter(m => {
-        const levelData = m.levels[encounterLevel - 1] || { primary: 0 };
-        const used = usedMachinesCount[m.name] || 0;
-        return levelData.primary > 0 && used < m.amount;
-    });
-    if (primaryCandidates.length > 0) {
-        const machine = primaryCandidates[Math.floor(Math.random() * primaryCandidates.length)];
-        const levelData = machine.levels[encounterLevel - 1];
-        let maxAllowed = Math.min(levelData.primary, machine.amount - (usedMachinesCount[machine.name] || 0));
-        const count = Math.min(maxAllowed, spawnFactor);
-        if (count > 0) {
-            usedMachinesCount[machine.name] = (usedMachinesCount[machine.name] || 0) + count;
-            chosenPrimary = machine.name;
-            primaryTotalCount = count;
-            for (let k = 0; k < count; k++) enemyDiffs.push(machine.difficultyModifier);
-        }
-    }
-
-    // --- Sekundär Enemy ---
-    const secondaryCandidates = validMachines.filter(m => {
-        const levelData = m.levels[encounterLevel - 1] || { secondary: 0 };
-        const used = usedMachinesCount[m.name] || 0;
-        return levelData.secondary > 0 && used < m.amount;
-    });
-    if (secondaryCandidates.length > 0) {
-        const machine = secondaryCandidates[Math.floor(Math.random() * secondaryCandidates.length)];
-        const levelData = machine.levels[encounterLevel - 1];
-        let maxAllowed = Math.min(levelData.secondary, machine.amount - (usedMachinesCount[machine.name] || 0));
-        const count = Math.min(maxAllowed, spawnFactor);
-        if (count > 0) {
-            usedMachinesCount[machine.name] = (usedMachinesCount[machine.name] || 0) + count;
-            chosenSecondary = machine.name;
-            secondaryTotalCount = count;
-            for (let k = 0; k < count; k++) enemyDiffs.push(machine.difficultyModifier);
-        }
-    }
-
-    // --- Difficulty berechnen ---
-    let diff = 0;
-    if (enemyDiffs.length > 0) {
-        diff = parseFloat((enemyDiffs.reduce((a, b) => a + b, 0) / enemyDiffs.length).toFixed(2));
-    }
-
-    // --- Tabelle rendern ---
-    tableInnerHtml = `
-        <tr>
-            <th>Primary Enemy (A)</th><th>Count</th>
-            <th>Secondary Enemy (B)</th><th>Count</th>
-        </tr>
-        <tr>
-            <td>${chosenPrimary || "-"}</td>
-            <td>${primaryTotalCount}</td>
-            <td>${chosenSecondary || "-"}</td>
-            <td>${secondaryTotalCount}</td>
-        </tr>
-    `;
-
-    console.log("Primary Enemy: " + chosenPrimary + "; Secondary Enemy: " + chosenSecondary);
-
-    machineList.innerHTML = tableInnerHtml;
-    levelIndicator.innerHTML = "Encounter Level: " + encounterLevel;
-    renderDifficultyBar(diff);
-
-    resources = Math.floor(Math.random() * 6);
-    document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
-}
-
 function update() {
     maxTiles = 0;
 
@@ -1538,17 +1286,8 @@ function update() {
 function generateTerrain() {
     terrainA = getRandomTerrain();
     terrainB = getRandomTerrain();
-
-    if (terrainA == "") {
-        document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol) " + "-";
-    } else {
-        document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol) " + terrainA;
-    }
-    if (terrainB == "") {
-        document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + "-";
-    } else {
-        document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol) " + terrainB;
-    }
+    document.getElementById("terrainSquare").innerHTML = "Terrain (square symbol): " + ((terrainA == "") ? "-" : terrainA);
+    document.getElementById("terrainTriangle").innerHTML = "Terrain (triangle symbol): " + ((terrainB == "") ? "-" : terrainB);
 }
 
 function generateEncounterCard(withNumbers) {
@@ -1847,7 +1586,7 @@ function generateEncounterBriefV6() {
 
   // --- Resources ---
   resources = Math.floor(Math.random() * 6);
-  document.getElementById("encounterResources").innerHTML = "Encounter Resources " + resources;
+  document.getElementById("encounterResources").innerHTML = "Encounter Resources: " + resources;
 
   saveValuesToStorage();
 }
